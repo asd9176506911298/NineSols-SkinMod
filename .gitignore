@@ -1,5 +1,6 @@
 /.idea
 /.vs
+Source/.vs
 
 /thunderstore/build
 obj
