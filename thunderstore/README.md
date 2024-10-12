@@ -1,4 +1,3 @@
-# Nine Sols Example Mod
+# Nine Sols Skin Mod
 
-Write a description of your mod here, it will be displayed on thunderstore.
-Remember to update the icon.png to something representing your mod.
+Nine Sols Skin Mod
