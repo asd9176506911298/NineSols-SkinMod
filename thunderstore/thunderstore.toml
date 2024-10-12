@@ -6,7 +6,7 @@ namespace = "SkinMod"
 name = "SkinMod"
 versionNumber = "0.1.0"
 description = "Nine Sols Skin Mod"
-websiteUrl = "link to the git repo"
+websiteUrl = "https://github.com/asd9176506911298/NineSols-SkinMod"
 containsNsfwContent = false
 
 [package.dependencies]
