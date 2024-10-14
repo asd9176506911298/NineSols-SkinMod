@@ -40,9 +40,19 @@ public class SkinMod : BaseUnityPlugin {
         jieChuanObject = tree.LoadAsset<GameObject>("JieChuan");
     }
 
+    void EnableShadow(bool enable) {
+        GameObject shadowRoot = GameObject.Find("CameraCore/DummyPlayer/ShadowRoot");
+
+        if (shadowRoot != null) {
+            shadowRoot.SetActive(enable);
+        }
+    }
+
     private void ToggleSkin() {
         ToastManager.Toast("ToggleSkin DDD");
         Logger.LogInfo("ToggleSkin");
+
+        ToastManager.Toast(GameObject.Find("CameraCore/DummyPlayer/ShadowRoot"));
 
         if (Player.i == null) return;
 
@@ -55,12 +65,14 @@ public class SkinMod : BaseUnityPlugin {
                 GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/JieChuan(Clone)").SetActive(false);
                 GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/PlayerSprite").layer = LayerMask.NameToLayer("Player");
                 isEnableSkin = false;
+                EnableShadow(true);
             } 
             else
             {
                 GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/JieChuan(Clone)").SetActive(true);
                 GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/PlayerSprite").layer = LayerMask.NameToLayer("UI");
                 isEnableSkin = true;
+                EnableShadow(false);
             }
         }
         else
@@ -76,11 +88,8 @@ public class SkinMod : BaseUnityPlugin {
 
             GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/PlayerSprite").layer = LayerMask.NameToLayer("UI");
             isEnableSkin = true;
+            EnableShadow(false);
         }
-        
-        
-
-
     }
 
     private void OnDestroy() {  
