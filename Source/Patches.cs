@@ -1,4 +1,8 @@
 ﻿using HarmonyLib;
+using NineSolsAPI;
+using RCGFSM.Projectiles;
+using System;
+using UnityEngine;
 
 namespace SkinMod;
 
@@ -9,11 +13,26 @@ public class Patches {
     // change parameters and inject custom code.
     // Make sure to use them only when necessary and keep compatibility with other mods in mind.
     // Documentation on how to patch can be found in the harmony docs: https://harmony.pardeike.net/articles/patching.html
-    //[HarmonyPatch(typeof(Player), nameof(Player.SetStoryWalk))]
+    //[HarmonyPatch(typeof(PoolManager), "BorrowOrInstantiate",
+    //new Type[] { typeof(GameObject), typeof(Vector3), typeof(Quaternion), typeof(Transform), typeof(Action<PoolObject>) })]
     //[HarmonyPrefix]
-    //private static bool PatchStoryWalk(ref float walkModifier) {
-    //    walkModifier = 1.0f;
+    //public static bool Patch(ref GameObject __result, GameObject obj, Vector3 position, Quaternion rotation, Transform parent = null, Action<PoolObject> handler = null) {
+
+    //    //ToastManager.Toast(obj.name);
 
     //    return true; // the original method should be executed
     //}
+
+    [HarmonyPatch(typeof(PoolManager), "Borrow",
+    new Type[] { typeof(PoolObject), typeof(Vector3), typeof(Quaternion), typeof(Transform), typeof(Action<PoolObject>) })]
+    [HarmonyPrefix]
+    public static bool Prefix(ref PoolObject __result, PoolObject prefab, Vector3 position, Quaternion rotation, Transform parent = null, Action<PoolObject> handler = null) {
+
+        if (prefab.name == "MultiSpriteEffect_Prefab 燃燒Variant")
+            return false;
+
+        return true; // the original method should be executed
+    }
+
+
 }

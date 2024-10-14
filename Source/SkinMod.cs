@@ -20,11 +20,12 @@ public class SkinMod : BaseUnityPlugin {
 
     private AssetBundle tree;
     private GameObject danceObject;
+    private GameObject jieChuanObject;
 
     private void Awake() {
         RCGLifeCycle.DontDestroyForever(gameObject);
 
-        harmony = Harmony.CreateAndPatchAll(typeof(SkinMod).Assembly);
+        harmony = Harmony.CreateAndPatchAll(typeof(Patches).Assembly);
 
         //enableSkinConfig = Config.Bind("", "Enable Skin", false, "");
         enableSkinKeyboardShortcut = Config.Bind("", "Enable Skin Shortcut",
@@ -36,27 +37,28 @@ public class SkinMod : BaseUnityPlugin {
 
         tree = AssemblyUtils.GetEmbeddedAssetBundle("SkinMod.Resources.tree");
         danceObject = tree.LoadAsset<GameObject>("danceRemoveObject");
+        jieChuanObject = tree.LoadAsset<GameObject>("JieChuan");
     }
 
     private void ToggleSkin() {
-        //ToastManager.Toast("ToggleSkin");
+        ToastManager.Toast("ToggleSkin DDD");
         Logger.LogInfo("ToggleSkin");
 
         if (Player.i == null) return;
 
-        bool hasSkin = GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/danceRemoveObject(Clone)");
+        bool hasSkin = GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/JieChuan(Clone)");
 
         if (hasSkin) 
             {
             if (isEnableSkin)
             {
-                GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/danceRemoveObject(Clone)").SetActive(false);
+                GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/JieChuan(Clone)").SetActive(false);
                 GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/PlayerSprite").layer = LayerMask.NameToLayer("Player");
                 isEnableSkin = false;
             } 
             else
             {
-                GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/danceRemoveObject(Clone)").SetActive(true);
+                GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/JieChuan(Clone)").SetActive(true);
                 GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/PlayerSprite").layer = LayerMask.NameToLayer("UI");
                 isEnableSkin = true;
             }
@@ -64,9 +66,14 @@ public class SkinMod : BaseUnityPlugin {
         else
         {
             Vector3 dancePos = new Vector3(Player.i.transform.position.x, Player.i.transform.position.y + 35, Player.i.transform.position.z);
-            GameObject skin = Instantiate(danceObject, dancePos, Quaternion.identity, GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder").transform);
-            skin.transform.localPosition = new Vector3(0f, 11.2001f, 0f);
-            skin.transform.localScale = new Vector3(0.55f, 0.55f, 0.55f);
+            GameObject skin = Instantiate(jieChuanObject, dancePos, Quaternion.identity, GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder").transform);
+            // Yi Dance
+            //skin.transform.localPosition = new Vector3(0f, 11.2001f, 0f);
+            //skin.transform.localScale = new Vector3(0.55f, 0.55f, 0.55f);
+            // JieChuan 
+            skin.transform.localPosition = new Vector3(0.6006f, 11.6006f, 0f);
+            skin.transform.localScale = new Vector3(5f, 5f, 5f);
+
             GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/PlayerSprite").layer = LayerMask.NameToLayer("UI");
             isEnableSkin = true;
         }
