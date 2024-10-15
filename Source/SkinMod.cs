@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
+
 using BepInEx.Logging;
 using HarmonyLib;
 using NineSolsAPI;
@@ -10,11 +11,11 @@ namespace SkinMod {
     [BepInDependency(NineSolsAPICore.PluginGUID)]
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
     public class SkinMod : BaseUnityPlugin {
-        private ConfigEntry<bool> enableSkinConfig;
         private ConfigEntry<KeyboardShortcut> enableSkinKeyboardShortcut;
         private ConfigEntry<string> curSkin;
         private ConfigEntry<bool> danceYi;
         private ConfigEntry<bool> jieChuan;
+        private ConfigEntry<bool> usagi;
 
         private Harmony harmony;
 
@@ -26,6 +27,7 @@ namespace SkinMod {
         private AssetBundle tree;
         private GameObject danceYiObject;
         private GameObject jieChuanObject;
+        private GameObject usagiObject;
 
         private const string SkinHolderPath = "GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder";
 
@@ -34,13 +36,32 @@ namespace SkinMod {
 
             harmony = Harmony.CreateAndPatchAll(typeof(Patches).Assembly);
 
-            enableSkinKeyboardShortcut = Config.Bind("", "Enable Skin Shortcut", new KeyboardShortcut(KeyCode.Q, KeyCode.LeftShift), "");
-            curSkin = Config.Bind<string>("", "currSkin", "", "");
-            danceYi = Config.Bind<bool>("", "DanceYi", true, "");
-            jieChuan = Config.Bind<bool>("", "JieChuan", false, "");
+
+            curSkin = Config.Bind<string>("", "currSkin", "",
+            new ConfigDescription("", null,
+            new ConfigurationManagerAttributes { Order = 5 }));
+
+            danceYi = Config.Bind<bool>("", "DanceYi", true,
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 4 }));
+
+            jieChuan = Config.Bind<bool>("", "JieChuan", false,
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 3 }));
+
+            usagi = Config.Bind<bool>("", "Usagi", false,
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 2 }));
+
+            enableSkinKeyboardShortcut = Config.Bind("", "Enable Skin Shortcut",
+                        new KeyboardShortcut(KeyCode.Q, KeyCode.LeftShift),
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 1 }));
+
 
             danceYi.SettingChanged += (s, e) => OnSkinChanged("DanceYi", danceYiObject, "danceRemoveObject");
             jieChuan.SettingChanged += (s, e) => OnSkinChanged("JieChuan", jieChuanObject, "JieChuan");
+            usagi.SettingChanged += (s, e) => OnSkinChanged("Usagi", usagiObject, "Usagi");
 
             KeybindManager.Add(this, ToggleSkin, () => enableSkinKeyboardShortcut.Value);
 
@@ -49,6 +70,7 @@ namespace SkinMod {
             tree = AssemblyUtils.GetEmbeddedAssetBundle("SkinMod.Resources.tree");
             danceYiObject = tree.LoadAsset<GameObject>("danceRemoveObject");
             jieChuanObject = tree.LoadAsset<GameObject>("JieChuan");
+            usagiObject = tree.LoadAsset<GameObject>("Usagi");
         }
 
         private void OnSkinChanged(string skinName, GameObject skinObject, string objName) {
@@ -68,11 +90,9 @@ namespace SkinMod {
             GameObject skin = GameObject.Find(objectPath);
 
             if (skin) {
-                ToastManager.Toast(isEnableSkin);
                 ProcessVisible(isEnableSkin);
                 isEnableSkin = !isEnableSkin;
             } else {
-                ToastManager.Toast(isEnableSkin);
                 CreateSkin();
                 ProcessVisible(false);
                 isEnableSkin = true;
@@ -114,6 +134,9 @@ namespace SkinMod {
             } else if (curSkin.Value == "JieChuan") {
                 skinClone.transform.localPosition = new Vector3(0.6006f, 11.6006f, 0f);
                 skinClone.transform.localScale = new Vector3(5f, 5f, 5f);
+            } else if (curSkin.Value == "Usagi") {
+                skinClone.transform.localPosition = new Vector3(2.601f, 14.7012f, 0f);
+                skinClone.transform.localScale = new Vector3(1.3f, 1.3f, 1.3f);
             }
 
             SetPlayerSpriteLayer("UI");

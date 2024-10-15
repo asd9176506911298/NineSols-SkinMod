@@ -2,4 +2,4 @@
 
 # Feature
 - Enable Skin (Shift + Q) 
-- you can change Shortcut in config or using BepinExConfigurationManager
+- you can change Shortcut in configEditor or using BepinExConfigurationManager
