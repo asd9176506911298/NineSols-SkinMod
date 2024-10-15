@@ -4,7 +4,7 @@ schemaVersion = "0.0.1"
 [package]
 namespace = "SkinMod"
 name = "SkinMod"
-versionNumber = "0.2.2"
+versionNumber = "0.2.3"
 description = "Nine Sols Skin Mod"
 websiteUrl = "https://github.com/asd9176506911298/NineSols-SkinMod"
 containsNsfwContent = false
@@ -12,6 +12,7 @@ containsNsfwContent = false
 [package.dependencies]
 "BepInEx-BepInExPack" = "5.4.2100"
 "ninesolsmodding-NineSolsAPI" = "0.4.1"
+"ninesolsmodding-BepinExConfigurationManager" = "18.3.1"
 
 [build]
 icon = "./icon.png"

@@ -16,6 +16,7 @@ namespace SkinMod {
         private ConfigEntry<bool> danceYi;
         private ConfigEntry<bool> jieChuan;
         private ConfigEntry<bool> usagi;
+        private ConfigEntry<bool> jee;
 
         private Harmony harmony;
 
@@ -28,6 +29,7 @@ namespace SkinMod {
         private GameObject danceYiObject;
         private GameObject jieChuanObject;
         private GameObject usagiObject;
+        private GameObject jeeObject;
 
         private const string SkinHolderPath = "GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder";
 
@@ -53,6 +55,10 @@ namespace SkinMod {
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 2 }));
 
+            jee = Config.Bind<bool>("", "Jee", false,
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 2 }));
+
             enableSkinKeyboardShortcut = Config.Bind("", "Enable Skin Shortcut",
                         new KeyboardShortcut(KeyCode.Q, KeyCode.LeftShift),
                         new ConfigDescription("", null,
@@ -62,6 +68,8 @@ namespace SkinMod {
             danceYi.SettingChanged += (s, e) => OnSkinChanged("DanceYi", danceYiObject, "danceRemoveObject");
             jieChuan.SettingChanged += (s, e) => OnSkinChanged("JieChuan", jieChuanObject, "JieChuan");
             usagi.SettingChanged += (s, e) => OnSkinChanged("Usagi", usagiObject, "Usagi");
+            jee.SettingChanged += (s, e) => OnSkinChanged("Jee", jeeObject, "Jee");
+
 
             KeybindManager.Add(this, ToggleSkin, () => enableSkinKeyboardShortcut.Value);
 
@@ -71,6 +79,7 @@ namespace SkinMod {
             danceYiObject = tree.LoadAsset<GameObject>("danceRemoveObject");
             jieChuanObject = tree.LoadAsset<GameObject>("JieChuan");
             usagiObject = tree.LoadAsset<GameObject>("Usagi");
+            jeeObject = tree.LoadAsset<GameObject>("Jee");
         }
 
         private void OnSkinChanged(string skinName, GameObject skinObject, string objName) {
@@ -137,6 +146,12 @@ namespace SkinMod {
             } else if (curSkin.Value == "Usagi") {
                 skinClone.transform.localPosition = new Vector3(2.601f, 14.7012f, 0f);
                 skinClone.transform.localScale = new Vector3(1.3f, 1.3f, 1.3f);
+            } else if (curSkin.Value == "Jee") {
+                skinClone.transform.localPosition = new Vector3(-0.699f, 17.7012f, 0f);
+                skinClone.transform.localScale = new Vector3(-13f, -13f, 13f);
+                skinClone.transform.Find("Hand Right").gameObject.transform.localScale = new Vector3(0.26f, -0.26f, 0.26f);
+                skinClone.transform.Find("Hand Left").gameObject.transform.localScale = new Vector3(0.26f, -0.26f, 0.26f);
+                skinClone.transform.Find("Hand Right").gameObject.transform.eulerAngles = new Vector3(0f, 0f, 350f);
             }
 
             SetPlayerSpriteLayer("UI");
