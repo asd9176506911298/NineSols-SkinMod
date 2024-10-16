@@ -44,22 +44,25 @@ public class Patches {
 
         //ToastManager.Toast(stateName);
 
-        GameObject jie = GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/JieChuan(Clone)/Animator");
+        GameObject curObject = GameObject.Find($"GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/{SkinMod.Instance.objectName}(Clone)/Animator");
 
-        if (jie == null)
+        //ToastManager.Toast(curObject);
+
+        if (curObject == null)  
             return true;
 
-        Animator anim = jie.GetComponent<Animator>();
+        Animator anim = curObject.GetComponent<Animator>();
 
         if (stateName == "Idle") {
             anim.SetInteger("Status", 0);
-        }
-        else if (stateName.Contains("Run")) {
+        } else if (stateName.Contains("Run")) {
             anim.SetInteger("Status", 1);
-        }
-        if (stateName.Contains("Parry")) {
+        } else if (stateName.Contains("Parry")) {
             anim.SetInteger("Status", 2);
+        } else if (stateName.Contains("DashRoll")) {
+            anim.SetInteger("Status", 3);
         }
+
 
         return true; // the original method should be executed
     }

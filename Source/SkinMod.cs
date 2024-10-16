@@ -11,16 +11,19 @@ namespace SkinMod {
     [BepInDependency(NineSolsAPICore.PluginGUID)]
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
     public class SkinMod : BaseUnityPlugin {
+        public static SkinMod Instance { get; private set; }
+
         private ConfigEntry<KeyboardShortcut> enableSkinKeyboardShortcut;
-        private ConfigEntry<string> curSkin;
+        public ConfigEntry<string> curSkin;
         private ConfigEntry<bool> danceYi;
         private ConfigEntry<bool> jieChuan;
         private ConfigEntry<bool> usagi;
         private ConfigEntry<bool> jee;
+        private ConfigEntry<bool> heng;
 
         private Harmony harmony;
 
-        private string objectName;
+        public string objectName;
         private GameObject curSkinObject;
 
         private bool isEnableSkin = false;
@@ -30,11 +33,14 @@ namespace SkinMod {
         private GameObject jieChuanObject;
         private GameObject usagiObject;
         private GameObject jeeObject;
+        private GameObject hengObject;
 
         private const string SkinHolderPath = "GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder";
 
         private void Awake() {
             RCGLifeCycle.DontDestroyForever(gameObject);
+
+            Instance = this;
 
             harmony = Harmony.CreateAndPatchAll(typeof(Patches).Assembly);
 
@@ -59,6 +65,10 @@ namespace SkinMod {
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 2 }));
 
+            heng = Config.Bind<bool>("", "Heng", false,
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 2 }));
+
             enableSkinKeyboardShortcut = Config.Bind("", "Enable Skin Shortcut",
                         new KeyboardShortcut(KeyCode.Q, KeyCode.LeftShift),
                         new ConfigDescription("", null,
@@ -69,7 +79,7 @@ namespace SkinMod {
             jieChuan.SettingChanged += (s, e) => OnSkinChanged("JieChuan", jieChuanObject, "JieChuan");
             usagi.SettingChanged += (s, e) => OnSkinChanged("Usagi", usagiObject, "Usagi");
             jee.SettingChanged += (s, e) => OnSkinChanged("Jee", jeeObject, "Jee");
-
+            heng.SettingChanged += (s, e) => OnSkinChanged("Heng", hengObject, "Heng");
 
             KeybindManager.Add(this, ToggleSkin, () => enableSkinKeyboardShortcut.Value);
 
@@ -80,6 +90,7 @@ namespace SkinMod {
             jieChuanObject = tree.LoadAsset<GameObject>("JieChuan");
             usagiObject = tree.LoadAsset<GameObject>("Usagi");
             jeeObject = tree.LoadAsset<GameObject>("Jee");
+            hengObject = tree.LoadAsset<GameObject>("Heng");
         }
 
         private void OnSkinChanged(string skinName, GameObject skinObject, string objName) {
@@ -153,6 +164,9 @@ namespace SkinMod {
                 skinClone.transform.Find("Hand Right").gameObject.transform.localScale = new Vector3(0.26f, -0.26f, 0.26f);
                 skinClone.transform.Find("Hand Left").gameObject.transform.localScale = new Vector3(0.26f, -0.26f, 0.26f);
                 skinClone.transform.Find("Hand Right").gameObject.transform.eulerAngles = new Vector3(0f, 0f, 350f);
+            } else if (curSkin.Value == "Heng") {
+                skinClone.transform.localPosition = new Vector3(-3.499f, 17.7012f, 0f);
+                skinClone.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
             }
 
             SetPlayerSpriteLayer("UI");
