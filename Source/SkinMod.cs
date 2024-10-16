@@ -111,6 +111,7 @@ namespace SkinMod {
         private void ProcessVisible(bool enable) {
             SetSkinActive(!enable);
             SetPlayerSpriteLayer(enable ? "Player" : "UI");
+            activeHeal(enable);
             EnableShadow(enable);
         }
 
@@ -141,7 +142,7 @@ namespace SkinMod {
                 skinClone.transform.localPosition = new Vector3(0f, 11.2001f, 0f);
                 skinClone.transform.localScale = new Vector3(0.55f, 0.55f, 0.55f);
             } else if (curSkin.Value == "JieChuan") {
-                skinClone.transform.localPosition = new Vector3(0.6006f, 11.6006f, 0f);
+                skinClone.transform.localPosition = new Vector3(-0.399f, 28.3011f, 0f);
                 skinClone.transform.localScale = new Vector3(5f, 5f, 5f);
             } else if (curSkin.Value == "Usagi") {
                 skinClone.transform.localPosition = new Vector3(2.601f, 14.7012f, 0f);
@@ -157,6 +158,12 @@ namespace SkinMod {
             SetPlayerSpriteLayer("UI");
             isEnableSkin = true;
             EnableShadow(false);
+        }
+
+        private void activeHeal(bool active) {
+            GameObject HealSmoke = GameObject.Find($"{SkinHolderPath}/PlayerSprite/HealSmoke/GameObject3");
+            if (HealSmoke != null)
+                HealSmoke.SetActive(active);
         }
 
         private void ResetSkins() {

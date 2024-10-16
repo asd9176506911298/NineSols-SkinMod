@@ -1,8 +1,11 @@
 ﻿using HarmonyLib;
+using MonsterLove.StateMachine;
 using NineSolsAPI;
 using RCGFSM.Projectiles;
+using RCGMaker.Core;
 using System;
 using UnityEngine;
+using static Linefy.PolygonalMesh;
 
 namespace SkinMod;
 
@@ -34,5 +37,30 @@ public class Patches {
         return true; // the original method should be executed
     }
 
+    [HarmonyPrefix, HarmonyPatch(typeof(Actor), "PlayAnimation", new Type[] {typeof(string),typeof(bool),typeof(float)})]
+    private static bool PatcUpdate(ref Actor __instance, string stateName) {
+        if (__instance != Player.i)
+            return true;
 
+        //ToastManager.Toast(stateName);
+
+        GameObject jie = GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/JieChuan(Clone)/Animator");
+
+        if (jie == null)
+            return true;
+
+        Animator anim = jie.GetComponent<Animator>();
+
+        if (stateName == "Idle") {
+            anim.SetInteger("Status", 0);
+        }
+        else if (stateName.Contains("Run")) {
+            anim.SetInteger("Status", 1);
+        }
+        if (stateName.Contains("Parry")) {
+            anim.SetInteger("Status", 2);
+        }
+
+        return true; // the original method should be executed
+    }
 }
