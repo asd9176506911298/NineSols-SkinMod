@@ -66,6 +66,8 @@ public class Patches {
             anim.SetInteger("Status", 4);
         } else if (stateName.Contains("AirAttack")) {
             anim.SetInteger("Status", 5);
+        } else if (stateName.Contains("Shoot") && ( stateName.Contains("Prepare") || stateName.Contains("In Air"))) {
+            anim.SetInteger("Status", 6);
         } else {
             anim.SetInteger("Status", 0);
         }
