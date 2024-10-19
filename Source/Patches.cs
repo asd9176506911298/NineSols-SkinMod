@@ -43,7 +43,7 @@ public class Patches {
         if (__instance != Player.i)
             return true;
 
-        ToastManager.Toast(stateName);
+        //ToastManager.Toast(stateName);
 
         GameObject curObject = GameObject.Find($"GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/{SkinMod.Instance.objectName}(Clone)/Animator");
 
@@ -66,6 +66,8 @@ public class Patches {
             anim.SetInteger("Status", 4);
         } else if (stateName.Contains("AirAttack")) {
             anim.SetInteger("Status", 5);
+        } else {
+            anim.SetInteger("Status", 0);
         }
 
 

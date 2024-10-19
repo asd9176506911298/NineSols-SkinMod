@@ -86,7 +86,7 @@ namespace SkinMod {
             usagi.SettingChanged += (s, e) => OnSkinChanged("Usagi", usagiObject, "Usagi");
             jee.SettingChanged += (s, e) => OnSkinChanged("Jee", jeeObject, "Jee");
             heng.SettingChanged += (s, e) => OnSkinChanged("Heng", hengObject, "Heng");
-            goblin.SettingChanged += (s, e) => OnSkinChanged("Goblin", hengObject, "Goblin");
+            goblin.SettingChanged += (s, e) => OnSkinChanged("Goblin", goblinObject, "Goblin");
 
             KeybindManager.Add(this, ToggleSkin, () => enableSkinKeyboardShortcut.Value);
 
@@ -98,7 +98,7 @@ namespace SkinMod {
             usagiObject = tree.LoadAsset<GameObject>("Usagi");
             jeeObject = tree.LoadAsset<GameObject>("Jee");
             hengObject = tree.LoadAsset<GameObject>("Heng");
-            //goblinObject = tree.LoadAsset<GameObject>("Goblin");
+            goblinObject = tree.LoadAsset<GameObject>("Goblin");
         }
 
         private void OnSkinChanged(string skinName, GameObject skinObject, string objName) {
@@ -176,8 +176,8 @@ namespace SkinMod {
                 skinClone.transform.localPosition = new Vector3(-3.499f, 17.7012f, 0f);
                 skinClone.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
             } else if (curSkin.Value == "Goblin") {
-                skinClone.transform.localPosition = new Vector3(-3.499f, 17.7012f, 0f);
-                skinClone.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+                skinClone.transform.localPosition = new Vector3(-1.499f, 12.7012f, 0f);
+                skinClone.transform.localScale = new Vector3(7f, 7f, 7f);   
             }
 
             SetPlayerSpriteLayer("UI");
