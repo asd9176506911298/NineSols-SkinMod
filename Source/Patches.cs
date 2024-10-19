@@ -31,8 +31,9 @@ public class Patches {
     [HarmonyPrefix]
     public static bool Prefix(ref PoolObject __result, PoolObject prefab, Vector3 position, Quaternion rotation, Transform parent = null, Action<PoolObject> handler = null) {
 
-        if (prefab.name == "MultiSpriteEffect_Prefab 燃燒Variant")
-            return false;
+        if(SkinMod.Instance.isEnableSkin)
+            if (prefab.name == "MultiSpriteEffect_Prefab 燃燒Variant")
+                return false;
 
         return true; // the original method should be executed
     }
@@ -42,7 +43,7 @@ public class Patches {
         if (__instance != Player.i)
             return true;
 
-        //ToastManager.Toast(stateName);
+        ToastManager.Toast(stateName);
 
         GameObject curObject = GameObject.Find($"GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/{SkinMod.Instance.objectName}(Clone)/Animator");
 
@@ -61,7 +62,12 @@ public class Patches {
             anim.SetInteger("Status", 2);
         } else if (stateName.Contains("DashRoll")) {
             anim.SetInteger("Status", 3);
+        } else if (stateName.Contains("Heal")) {
+            anim.SetInteger("Status", 4);
+        } else if (stateName.Contains("AirAttack")) {
+            anim.SetInteger("Status", 5);
         }
+
 
 
         return true; // the original method should be executed
