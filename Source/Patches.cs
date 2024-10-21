@@ -4,6 +4,7 @@ using NineSolsAPI;
 using RCGFSM.Projectiles;
 using RCGMaker.Core;
 using System;
+using System.Linq;
 using UnityEngine;
 using static Linefy.PolygonalMesh;
 
@@ -43,7 +44,33 @@ public class Patches {
         if (__instance != Player.i)
             return true;
 
-        //ToastManager.Toast(stateName);
+        //ToastManager.Toast("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/Attack(Clone)/Animator");
+
+        
+
+        GameObject atkObject = GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/Attack(Clone)/Animator");
+
+        if (atkObject == null)
+            return true;
+
+        Animator atkAnim = atkObject.GetComponent<Animator>();
+        if ((stateName.Contains("Attack1") || stateName.Contains("Attack2") || stateName.Contains("Attack3") || stateName.Contains("AirAttack")) && !stateName.Contains("Charge")){
+            atkAnim.SetInteger("Attack", 1);
+        } else if (stateName.Contains("Foo")) {
+            atkAnim.SetInteger("Attack", 2);
+        } else if (stateName.Contains("Attack") && stateName.Contains("Charge")) {
+            atkAnim.SetInteger("Attack", 3);
+        } else if (stateName.Contains("ParryCounterDeflectAttack")) {
+            atkAnim.SetInteger("Attack", 4);
+        } else if (stateName.Contains("Parry")) {
+            atkAnim.SetInteger("Attack", 5);
+        } else if (stateName.Contains("Run") || stateName.Contains("Jump") || stateName.Contains("Fall") || stateName.Contains("DashRoll")) {
+            atkAnim.SetInteger("Attack", 6);
+        } else {
+            atkAnim.SetInteger("Attack", 0);
+        }
+
+        ToastManager.Toast(stateName);
 
         GameObject curObject = GameObject.Find($"GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/{SkinMod.Instance.objectName}(Clone)/Animator");
 
@@ -72,7 +99,7 @@ public class Patches {
             anim.SetInteger("Status", 0);
         }
 
-
+        
 
         return true; // the original method should be executed
     }

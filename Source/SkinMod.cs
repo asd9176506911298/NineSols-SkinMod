@@ -14,6 +14,7 @@ namespace SkinMod {
         public static SkinMod Instance { get; private set; }
 
         private ConfigEntry<KeyboardShortcut> enableSkinKeyboardShortcut;
+        private ConfigEntry<KeyboardShortcut> somethingKeyboardShortcut = null!;
         public ConfigEntry<string> curSkin;
         private ConfigEntry<bool> danceYi;
         private ConfigEntry<bool> jieChuan;
@@ -80,6 +81,9 @@ namespace SkinMod {
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 1 }));
 
+            somethingKeyboardShortcut = Config.Bind("General.Something", "Shortcut",
+            new KeyboardShortcut(KeyCode.Q, KeyCode.LeftControl), "Shortcut to execute");
+            KeybindManager.Add(this, TestMethod, () => somethingKeyboardShortcut.Value);
 
             danceYi.SettingChanged += (s, e) => OnSkinChanged("DanceYi", danceYiObject, "danceRemoveObject");
             jieChuan.SettingChanged += (s, e) => OnSkinChanged("JieChuan", jieChuanObject, "JieChuan");
@@ -99,6 +103,24 @@ namespace SkinMod {
             jeeObject = tree.LoadAsset<GameObject>("Jee");
             hengObject = tree.LoadAsset<GameObject>("Heng");
             goblinObject = tree.LoadAsset<GameObject>("Goblin");
+        }
+
+        void TestMethod() {
+            ToastManager.Toast("Toast");
+            GameObject atkObject = GameObject.Find($"{SkinHolderPath}/Attack(Clone)");
+            if (atkObject != null) {
+                Destroy(atkObject);
+            }
+
+            GameObject parryEffectObject = GameObject.Find($"{SkinHolderPath}/PlayerSprite/Effect_TAICHIParry/Effect_ParryCounterAttack0");
+            if (parryEffectObject != null) {
+                parryEffectObject.SetActive(false);
+            }
+
+            GameObject.Find($"{SkinHolderPath}/Effect_Attack").gameObject.transform.localPosition = new Vector3(0f, -8f, 8000f);
+            Vector3 skinPos = new Vector3(Player.i.transform.position.x, Player.i.transform.position.y + 25, Player.i.transform.position.z);
+            GameObject skinClone = Instantiate(tree.LoadAsset<GameObject>("Attack"), skinPos, Quaternion.identity, GameObject.Find(SkinHolderPath).transform);
+            
         }
 
         private void OnSkinChanged(string skinName, GameObject skinObject, string objName) {
