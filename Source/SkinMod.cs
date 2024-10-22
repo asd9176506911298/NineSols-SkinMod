@@ -22,6 +22,7 @@ namespace SkinMod {
         private ConfigEntry<bool> jee;
         private ConfigEntry<bool> heng;
         private ConfigEntry<bool> goblin;
+        private ConfigEntry<bool> attackEffect;
 
         private Harmony harmony;
 
@@ -47,32 +48,35 @@ namespace SkinMod {
 
             harmony = Harmony.CreateAndPatchAll(typeof(Patches).Assembly);
 
-
             curSkin = Config.Bind<string>("", "currSkin", "",
             new ConfigDescription("", null,
-            new ConfigurationManagerAttributes { Order = 5 }));
+            new ConfigurationManagerAttributes { Order = 9 }));
 
             danceYi = Config.Bind<bool>("", "DanceYi", true,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 4 }));
+                        new ConfigurationManagerAttributes { Order = 8 }));
 
             jieChuan = Config.Bind<bool>("", "JieChuan", false,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 3 }));
+                        new ConfigurationManagerAttributes { Order = 7 }));
 
             usagi = Config.Bind<bool>("", "Usagi", false,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 2 }));
+                        new ConfigurationManagerAttributes { Order = 6 }));
 
             jee = Config.Bind<bool>("", "Jee", false,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 2 }));
+                        new ConfigurationManagerAttributes { Order = 5 }));
 
             heng = Config.Bind<bool>("", "Heng", false,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 2 }));
+                        new ConfigurationManagerAttributes { Order = 4 }));
 
             goblin = Config.Bind<bool>("", "Goblin", false,
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 3 }));
+
+            attackEffect = Config.Bind<bool>("", "AttackEffect", false,
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 2 }));
 
@@ -81,9 +85,9 @@ namespace SkinMod {
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 1 }));
 
-            somethingKeyboardShortcut = Config.Bind("General.Something", "Shortcut",
-            new KeyboardShortcut(KeyCode.Q, KeyCode.LeftControl), "Shortcut to execute");
-            KeybindManager.Add(this, TestMethod, () => somethingKeyboardShortcut.Value);
+            //somethingKeyboardShortcut = Config.Bind("General.Something", "Shortcut",
+            //new KeyboardShortcut(KeyCode.Q, KeyCode.LeftControl), "Shortcut to execute");
+            //KeybindManager.Add(this, TestMethod, () => somethingKeyboardShortcut.Value);
 
             danceYi.SettingChanged += (s, e) => OnSkinChanged("DanceYi", danceYiObject, "danceRemoveObject");
             jieChuan.SettingChanged += (s, e) => OnSkinChanged("JieChuan", jieChuanObject, "JieChuan");
@@ -91,6 +95,8 @@ namespace SkinMod {
             jee.SettingChanged += (s, e) => OnSkinChanged("Jee", jeeObject, "Jee");
             heng.SettingChanged += (s, e) => OnSkinChanged("Heng", hengObject, "Heng");
             goblin.SettingChanged += (s, e) => OnSkinChanged("Goblin", goblinObject, "Goblin");
+            attackEffect.SettingChanged += (s, e) => AttackEffect(attackEffect.Value);
+
 
             KeybindManager.Add(this, ToggleSkin, () => enableSkinKeyboardShortcut.Value);
 
@@ -105,23 +111,50 @@ namespace SkinMod {
             goblinObject = tree.LoadAsset<GameObject>("Goblin");
         }
 
-        void TestMethod() {
-            ToastManager.Toast("Toast");
+        void Start() {
+            curSkin.Value = "";
+            danceYi.Value = false;
+            jieChuan.Value = false;
+            usagi.Value = false;
+            jee.Value = false;
+            heng.Value = false;
+            goblin.Value = false;
+            attackEffect.Value = false;
+        }
+
+        void AttackEffect(bool isEnable) {
+            //ToastManager.Toast(isEnable);
+
+            if (Player.i == null)
+                return;
+
+            // Cache GameObject references
             GameObject atkObject = GameObject.Find($"{SkinHolderPath}/Attack(Clone)");
+            GameObject effectAttackObject = GameObject.Find($"{SkinHolderPath}/Effect_Attack")?.gameObject;
+            GameObject parryEffectObject = GameObject.Find($"{SkinHolderPath}/PlayerSprite/Effect_TAICHIParry/Effect_ParryCounterAttack0");
+
+            // Destroy the existing attack object if it exists
             if (atkObject != null) {
                 Destroy(atkObject);
             }
 
-            GameObject parryEffectObject = GameObject.Find($"{SkinHolderPath}/PlayerSprite/Effect_TAICHIParry/Effect_ParryCounterAttack0");
-            if (parryEffectObject != null) {
-                parryEffectObject.SetActive(false);
+            // Modify Effect_Attack's local position
+            if (effectAttackObject != null) {
+                effectAttackObject.transform.localPosition = isEnable ? new Vector3(0f, -8f, 8000f) : new Vector3(0f, -8f, 0f);
             }
 
-            GameObject.Find($"{SkinHolderPath}/Effect_Attack").gameObject.transform.localPosition = new Vector3(0f, -8f, 8000f);
-            Vector3 skinPos = new Vector3(Player.i.transform.position.x, Player.i.transform.position.y + 25, Player.i.transform.position.z);
-            GameObject skinClone = Instantiate(tree.LoadAsset<GameObject>("Attack"), skinPos, Quaternion.identity, GameObject.Find(SkinHolderPath).transform);
-            
+            // Handle enabling or disabling parry effect
+            if (parryEffectObject != null) {
+                parryEffectObject.SetActive(!isEnable);
+            }
+
+            // Instantiate the attack effect if enabled
+            if (isEnable) {
+                Vector3 skinPos = Player.i.transform.position + new Vector3(0, 25, 0);
+                Instantiate(tree.LoadAsset<GameObject>("Attack"), skinPos, Quaternion.identity, GameObject.Find(SkinHolderPath)?.transform);
+            }
         }
+
 
         private void OnSkinChanged(string skinName, GameObject skinObject, string objName) {
             ProcessVisible(true);

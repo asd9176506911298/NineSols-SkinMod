@@ -54,8 +54,15 @@ public class Patches {
             return true;
 
         Animator atkAnim = atkObject.GetComponent<Animator>();
-        if ((stateName.Contains("Attack1") || stateName.Contains("Attack2") || stateName.Contains("Attack3") || stateName.Contains("AirAttack")) && !stateName.Contains("Charge")){
-            atkAnim.SetInteger("Attack", 1);
+        //if ((stateName.Contains("Attack1") /*|| stateName.Contains("Attack2") || stateName.Contains("Attack3") || stateName.Contains("AirAttack"))*/ && !stateName.Contains("Charge"))){
+        if (stateName == "Attack1" || stateName == "AirAttack" || stateName == "WallAttack") {
+            atkAnim.SetInteger("Attack", 100);
+        } else if (stateName.Contains("Attack2")) {
+            atkAnim.SetInteger("Attack", 101);
+        } else if (stateName.Contains("Attack3")) {
+            atkAnim.SetInteger("Attack", 102);
+        } else if (stateName.Contains("Fall") || stateName.Contains("Jump") || stateName.Contains("ParryAirSpinNormalHit")) {
+            atkAnim.SetInteger("Attack", 201);
         } else if (stateName.Contains("Foo")) {
             atkAnim.SetInteger("Attack", 2);
         } else if (stateName.Contains("Attack") && stateName.Contains("Charge")) {
@@ -64,13 +71,13 @@ public class Patches {
             atkAnim.SetInteger("Attack", 4);
         } else if (stateName.Contains("Parry")) {
             atkAnim.SetInteger("Attack", 5);
-        } else if (stateName.Contains("Run") || stateName.Contains("Jump") || stateName.Contains("Fall") || stateName.Contains("DashRoll")) {
+        } else if (stateName.Contains("Run") || stateName.Contains("Jump") || stateName.Contains("DashRoll")) {
             atkAnim.SetInteger("Attack", 6);
         } else {
             atkAnim.SetInteger("Attack", 0);
         }
 
-        ToastManager.Toast(stateName);
+        //ToastManager.Toast(stateName);
 
         GameObject curObject = GameObject.Find($"GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/{SkinMod.Instance.objectName}(Clone)/Animator");
 
