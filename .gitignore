@@ -1,6 +1,9 @@
 /.idea
 /.vs
 Source/.vs
+Source/Resources/Resources
+Source/Resources/Resources.manifest
+Source/Resources/tree.manifest
 
 /thunderstore/build
 obj

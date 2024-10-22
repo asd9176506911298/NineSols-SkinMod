@@ -6,6 +6,7 @@ using HarmonyLib;
 using NineSolsAPI;
 using NineSolsAPI.Utils;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace SkinMod {
     [BepInDependency(NineSolsAPICore.PluginGUID)]
@@ -120,6 +121,8 @@ namespace SkinMod {
             heng.Value = false;
             goblin.Value = false;
             attackEffect.Value = false;
+
+            SceneManager.sceneLoaded += OnSceneLoaded;
         }
 
         void AttackEffect(bool isEnable) {
@@ -224,9 +227,9 @@ namespace SkinMod {
             } else if (curSkin.Value == "Jee") {
                 skinClone.transform.localPosition = new Vector3(-0.699f, 17.7012f, 0f);
                 skinClone.transform.localScale = new Vector3(-13f, -13f, 13f);
-                skinClone.transform.Find("Hand Right").gameObject.transform.localScale = new Vector3(0.26f, -0.26f, 0.26f);
-                skinClone.transform.Find("Hand Left").gameObject.transform.localScale = new Vector3(0.26f, -0.26f, 0.26f);
-                skinClone.transform.Find("Hand Right").gameObject.transform.eulerAngles = new Vector3(0f, 0f, 350f);
+                skinClone.transform.Find("Animator/Hand Right").gameObject.transform.localScale = new Vector3(0.26f, -0.26f, 0.26f);
+                skinClone.transform.Find("Animator/Hand Left").gameObject.transform.localScale = new Vector3(0.26f, -0.26f, 0.26f);
+                skinClone.transform.Find("Animator/Hand Right").gameObject.transform.eulerAngles = new Vector3(0f, 0f, 350f);
             } else if (curSkin.Value == "Heng") {
                 skinClone.transform.localPosition = new Vector3(-3.499f, 17.7012f, 0f);
                 skinClone.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
@@ -246,12 +249,21 @@ namespace SkinMod {
                 HealSmoke.SetActive(active);
         }
 
+        void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
+            //ToastManager.Toast(attackEffect.Value);
+            if (attackEffect.Value) {
+                AttackEffect(true);
+            }
+        }
+
         private void ResetSkins() {
             //danceYi.Value = false;
             //jieChuan.Value = false;
         }
 
         private void OnDestroy() {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+
             if (tree != null)
                 tree.Unload(false);
 

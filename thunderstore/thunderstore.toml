@@ -4,7 +4,7 @@ schemaVersion = "0.0.1"
 [package]
 namespace = "SkinMod"
 name = "SkinMod"
-versionNumber = "0.2.90"
+versionNumber = "0.2.91"
 description = "Nine Sols Skin Mod"
 websiteUrl = "https://github.com/asd9176506911298/NineSols-SkinMod"
 containsNsfwContent = false
