@@ -74,7 +74,7 @@ namespace SkinMod {
 
             curSkin = Config.Bind<string>("", "currSkin", "",
             new ConfigDescription("", null,
-            new ConfigurationManagerAttributes { Order = 21 }));
+            new ConfigurationManagerAttributes { Order = 24 }));
 
             danceYi = Config.Bind<bool>("", "DanceYi", true,
                         new ConfigDescription("", null,
