@@ -12,9 +12,10 @@
 - Chiikawa Goblin
 - AttackEffect
 - Custom picture or GIF
-- Custom position sacle rotate
+- Custom position sacle rotate order gifSpeed
 
 # Shortcut
 - Enable Skin (Shift + Q) 
+- Create Custom Pic or Gif(Ctrl + Q) 
 - you can change Shortcut in configEditor or using BepinExConfigurationManager
 
