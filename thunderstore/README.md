@@ -19,3 +19,5 @@
 - Create Custom Pic or Gif(Ctrl + Q) 
 - you can change Shortcut in configEditor or using BepinExConfigurationManager
 
+# ShowCase
+- https://youtu.be/DHwiIGkzd8c
