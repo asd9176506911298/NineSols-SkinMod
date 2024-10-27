@@ -3,11 +3,14 @@ using BepInEx.Configuration;
 
 using BepInEx.Logging;
 using HarmonyLib;
+using MonoMod.RuntimeDetour;
 using NineSolsAPI;
 using NineSolsAPI.Utils;
+using RCGFSM.PlayerAbility;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
 namespace SkinMod {
     [BepInDependency(NineSolsAPICore.PluginGUID)]
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
@@ -15,7 +18,7 @@ namespace SkinMod {
         public static SkinMod Instance { get; private set; }
 
         private ConfigEntry<KeyboardShortcut> enableSkinKeyboardShortcut;
-        private ConfigEntry<KeyboardShortcut> somethingKeyboardShortcut = null!;
+        private ConfigEntry<KeyboardShortcut> customObjectShortcut = null!;
         public ConfigEntry<string> curSkin;
         private ConfigEntry<bool> danceYi;
         private ConfigEntry<bool> jieChuan;
@@ -24,6 +27,20 @@ namespace SkinMod {
         private ConfigEntry<bool> heng;
         private ConfigEntry<bool> goblin;
         private ConfigEntry<bool> attackEffect;
+        private ConfigEntry<string> path;
+        private ConfigEntry<float> x;
+        private ConfigEntry<float> y;
+        private ConfigEntry<float> z;
+        private ConfigEntry<float> scaleX;
+        private ConfigEntry<float> scaleY;
+        private ConfigEntry<float> scaleZ;
+        private ConfigEntry<float> rotateX;
+        private ConfigEntry<float> rotateY;
+        private ConfigEntry<float> rotateZ;
+        private ConfigEntry<int> orderLayer;
+        private ConfigEntry<float> gifSpeed;
+        private ConfigEntry<bool> disableYi;
+        private ConfigEntry<bool> hideCustomObject;
 
         private Harmony harmony;
 
@@ -39,6 +56,12 @@ namespace SkinMod {
         private GameObject jeeObject;
         private GameObject hengObject;
         private GameObject goblinObject;
+        private GameObject customObject;
+
+        private testGif testgif;
+
+        public delegate void HandlerNoParam();
+        public HandlerNoParam onUpdate;
 
         private const string SkinHolderPath = "GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder";
 
@@ -51,33 +74,89 @@ namespace SkinMod {
 
             curSkin = Config.Bind<string>("", "currSkin", "",
             new ConfigDescription("", null,
-            new ConfigurationManagerAttributes { Order = 9 }));
+            new ConfigurationManagerAttributes { Order = 21 }));
 
             danceYi = Config.Bind<bool>("", "DanceYi", true,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 8 }));
+                        new ConfigurationManagerAttributes { Order = 20 }));
 
             jieChuan = Config.Bind<bool>("", "JieChuan", false,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 7 }));
+                        new ConfigurationManagerAttributes { Order = 19 }));
 
             usagi = Config.Bind<bool>("", "Usagi", false,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 6 }));
+                        new ConfigurationManagerAttributes { Order = 18 }));
 
             jee = Config.Bind<bool>("", "Jee", false,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 5 }));
+                        new ConfigurationManagerAttributes { Order = 17 }));
 
             heng = Config.Bind<bool>("", "Heng", false,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 4 }));
+                        new ConfigurationManagerAttributes { Order = 16 }));
 
             goblin = Config.Bind<bool>("", "Goblin", false,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 3 }));
+                        new ConfigurationManagerAttributes { Order = 15 }));
 
             attackEffect = Config.Bind<bool>("", "AttackEffect", false,
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 14 }));
+
+            path = Config.Bind<string>("", "path", "",
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 13 }));
+
+            x = Config.Bind<float>("", "Pos x", 0,
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 12 }));
+
+            y = Config.Bind<float>("", "Pos y", 0,
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 11 }));
+
+            z = Config.Bind<float>("", "Pos z", 0,
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 10 }));
+
+            scaleX = Config.Bind<float>("", "scaleX", 10,
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 9 }));
+
+            scaleY = Config.Bind<float>("", "scaleY", 10,
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 8 }));
+
+            scaleZ = Config.Bind<float>("", "scaleZ", 10,
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 7 }));
+
+            rotateX = Config.Bind<float>("", "RotateX", 0,
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 6 }));
+
+            rotateY = Config.Bind<float>("", "RotateY", 0,
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 5 }));
+
+            rotateZ = Config.Bind<float>("", "RotateZ", 0,
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 4 }));
+
+            orderLayer = Config.Bind<int>("", "orderLayer", 0,
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 3 }));
+
+            gifSpeed = Config.Bind<float>("", "GifSpeed", 1f,
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 3 }));
+
+            disableYi = Config.Bind<bool>("", "DisableYi", false,
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 2 }));
+
+            hideCustomObject = Config.Bind<bool>("", "HideCustomPic", false,
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 2 }));
 
@@ -86,9 +165,15 @@ namespace SkinMod {
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 1 }));
 
-            //somethingKeyboardShortcut = Config.Bind("General.Something", "Shortcut",
-            //new KeyboardShortcut(KeyCode.Q, KeyCode.LeftControl), "Shortcut to execute");
-            //KeybindManager.Add(this, TestMethod, () => somethingKeyboardShortcut.Value);
+            customObjectShortcut = Config.Bind("", "Create Custom Picture Gif Shortcut",
+                        new KeyboardShortcut(KeyCode.Q, KeyCode.LeftControl),
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 1 }));
+
+            KeybindManager.Add(this, ToggleSkin, () => enableSkinKeyboardShortcut.Value);
+            KeybindManager.Add(this, CustomObject, () => customObjectShortcut.Value);
+
+            disableYi.Value = false;
 
             danceYi.SettingChanged += (s, e) => OnSkinChanged("DanceYi", danceYiObject, "danceRemoveObject");
             jieChuan.SettingChanged += (s, e) => OnSkinChanged("JieChuan", jieChuanObject, "JieChuan");
@@ -97,9 +182,21 @@ namespace SkinMod {
             heng.SettingChanged += (s, e) => OnSkinChanged("Heng", hengObject, "Heng");
             goblin.SettingChanged += (s, e) => OnSkinChanged("Goblin", goblinObject, "Goblin");
             attackEffect.SettingChanged += (s, e) => AttackEffect(attackEffect.Value);
+            x.SettingChanged += (s, e) => UpdateCustom();
+            y.SettingChanged += (s, e) => UpdateCustom();
+            z.SettingChanged += (s, e) => UpdateCustom();
+            scaleX.SettingChanged += (s, e) => UpdateCustom();
+            scaleY.SettingChanged += (s, e) => UpdateCustom();
+            scaleZ.SettingChanged += (s, e) => UpdateCustom();
+            rotateX.SettingChanged += (s, e) => UpdateCustom();
+            rotateY.SettingChanged += (s, e) => UpdateCustom();
+            rotateZ.SettingChanged += (s, e) => UpdateCustom();
+            orderLayer.SettingChanged += (s, e) => UpdateCustom();
+            gifSpeed.SettingChanged += (s, e) => testgif.setSpeed(gifSpeed.Value);
+            disableYi.SettingChanged += (s, e) => ActiveYi(!disableYi.Value);
+            hideCustomObject.SettingChanged += (s, e) => hideCustomObjcet(hideCustomObject.Value);
 
 
-            KeybindManager.Add(this, ToggleSkin, () => enableSkinKeyboardShortcut.Value);
 
             Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
 
@@ -110,6 +207,86 @@ namespace SkinMod {
             jeeObject = tree.LoadAsset<GameObject>("Jee");
             hengObject = tree.LoadAsset<GameObject>("Heng");
             goblinObject = tree.LoadAsset<GameObject>("Goblin");
+
+            testgif = new testGif();
+            testgif.testHook();
+        }
+
+        void hideCustomObjcet(bool enable) {
+            if (GameObject.Find($"{SkinHolderPath}/customObject")) {
+                customObject = GameObject.Find($"{SkinHolderPath}/customObject");
+                customObject.SetActive(!enable);
+            }
+        }
+
+        void ActiveYi(bool enable) {
+            SetPlayerSpriteLayer(enable ? "Player" : "UI");
+            EnableShadow(enable);
+        }
+
+        string GetGameObjectPath(GameObject obj) {
+            string path = obj.name;
+            Transform current = obj.transform;
+
+            while (current.parent != null) {
+                current = current.parent;
+                path = current.name + "/" + path;
+            }
+
+            return path;
+        }
+
+        void Update() {
+            onUpdate?.Invoke();
+        }
+
+        void UpdateCustom() {
+            //ToastManager.Toast("test");
+            
+            customObject.transform.localPosition = new Vector3(x.Value, y.Value, z.Value);
+            customObject.transform.localScale = new Vector3(scaleX.Value, scaleY.Value, scaleZ.Value);
+            customObject.transform.eulerAngles = new Vector3(rotateX.Value, rotateY.Value, rotateZ.Value);
+            customObject.GetComponent<SpriteRenderer>().sortingOrder = orderLayer.Value;
+        }
+
+        void CustomObject() {
+            
+            //ToastManager.Toast("Test");
+
+            testgif.clear();
+
+            hideCustomObject.Value = true;
+
+            try {
+                if (!GameObject.Find($"{SkinHolderPath}/customObject")) {
+                    customObject = new GameObject("customObject");
+                    customObject.transform.position = Player.i.transform.position;
+                    customObject.transform.localScale = new Vector3(10f, 10f, 10f);
+                    customObject.transform.localPosition = new Vector3(Player.i.transform.position.x, Player.i.transform.position.y, Player.i.transform.position.z);
+                    customObject.transform.SetParent(GameObject.Find($"{SkinHolderPath}").transform);
+                    customObject.AddComponent<SpriteRenderer>();
+
+                    customObject.GetComponent<SpriteRenderer>().sprite = testGif.LoadSprite(path.Value);
+                    //Destroy(GameObject.Find($"{SkinHolderPath}/test"));
+                } else {
+                    customObject = GameObject.Find($"{SkinHolderPath}/customObject");
+                    GameObject.Find($"{SkinHolderPath}/customObject").GetComponent<SpriteRenderer>().sprite = testGif.LoadSprite(path.Value);
+                }
+
+                x.Value = customObject.transform.localPosition.x;
+                y.Value = customObject.transform.localPosition.y;
+                z.Value = customObject.transform.localPosition.z;
+                scaleX.Value = customObject.transform.localScale.x;
+                scaleY.Value = customObject.transform.localScale.y;
+                scaleZ.Value = customObject.transform.localScale.z;
+                rotateX.Value = customObject.transform.localEulerAngles.x;
+                rotateY.Value = customObject.transform.localEulerAngles.y;
+                rotateZ.Value = customObject.transform.localEulerAngles.z;
+
+
+            } catch (Exception e) {
+                //ToastManager.Toast(e);
+            }
         }
 
         void Start() {

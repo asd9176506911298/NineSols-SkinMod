@@ -1,6 +1,6 @@
 # Nine Sols Skin Mod
 
-# How to change Skin
+# How to Use
 - Press F1 select you want skin
 
 # Skin
@@ -11,6 +11,8 @@
 - Chiikawa Usagi
 - Chiikawa Goblin
 - AttackEffect
+- Custom picture or GIF
+- Custom position sacle rotate
 
 # Shortcut
 - Enable Skin (Shift + Q) 

@@ -32,9 +32,9 @@ public class Patches {
     [HarmonyPrefix]
     public static bool Prefix(ref PoolObject __result, PoolObject prefab, Vector3 position, Quaternion rotation, Transform parent = null, Action<PoolObject> handler = null) {
 
-        if(SkinMod.Instance.isEnableSkin)
-            if (prefab.name == "MultiSpriteEffect_Prefab 燃燒Variant")
-                return false;
+        //if(SkinMod.Instance.isEnableSkin)
+        if (prefab.name == "MultiSpriteEffect_Prefab 燃燒Variant")
+            return false;
 
         return true; // the original method should be executed
     }
