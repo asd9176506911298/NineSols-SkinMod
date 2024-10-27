@@ -78,92 +78,92 @@ namespace SkinMod {
 
             danceYi = Config.Bind<bool>("", "DanceYi", true,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 20 }));
+                        new ConfigurationManagerAttributes { Order = 23 }));
 
             jieChuan = Config.Bind<bool>("", "JieChuan", false,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 19 }));
+                        new ConfigurationManagerAttributes { Order = 22 }));
 
             usagi = Config.Bind<bool>("", "Usagi", false,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 18 }));
+                        new ConfigurationManagerAttributes { Order = 21 }));
 
             jee = Config.Bind<bool>("", "Jee", false,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 17 }));
+                        new ConfigurationManagerAttributes { Order = 20 }));
 
             heng = Config.Bind<bool>("", "Heng", false,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 16 }));
+                        new ConfigurationManagerAttributes { Order = 19 }));
 
             goblin = Config.Bind<bool>("", "Goblin", false,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 15 }));
+                        new ConfigurationManagerAttributes { Order = 18 }));
 
             attackEffect = Config.Bind<bool>("", "AttackEffect", false,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 14 }));
+                        new ConfigurationManagerAttributes { Order = 17 }));
 
             path = Config.Bind<string>("", "path", "",
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 13 }));
+                        new ConfigurationManagerAttributes { Order = 16 }));
 
             x = Config.Bind<float>("", "Pos x", 0,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 12 }));
+                        new ConfigurationManagerAttributes { Order = 15 }));
 
             y = Config.Bind<float>("", "Pos y", 0,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 11 }));
+                        new ConfigurationManagerAttributes { Order = 14 }));
 
             z = Config.Bind<float>("", "Pos z", 0,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 10 }));
+                        new ConfigurationManagerAttributes { Order = 13 }));
 
             scaleX = Config.Bind<float>("", "scaleX", 10,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 9 }));
+                        new ConfigurationManagerAttributes { Order = 12 }));
 
             scaleY = Config.Bind<float>("", "scaleY", 10,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 8 }));
+                        new ConfigurationManagerAttributes { Order = 11 }));
 
             scaleZ = Config.Bind<float>("", "scaleZ", 10,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 7 }));
+                        new ConfigurationManagerAttributes { Order = 10 }));
 
             rotateX = Config.Bind<float>("", "RotateX", 0,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 6 }));
+                        new ConfigurationManagerAttributes { Order = 9 }));
 
             rotateY = Config.Bind<float>("", "RotateY", 0,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 5 }));
+                        new ConfigurationManagerAttributes { Order = 8 }));
 
             rotateZ = Config.Bind<float>("", "RotateZ", 0,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 4 }));
+                        new ConfigurationManagerAttributes { Order = 7 }));
 
             orderLayer = Config.Bind<int>("", "orderLayer", 101,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 3 }));
+                        new ConfigurationManagerAttributes { Order = 6 }));
 
             gifSpeed = Config.Bind<float>("", "GifSpeed", 1f,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 3 }));
+                        new ConfigurationManagerAttributes { Order = 5 }));
 
             disableYi = Config.Bind<bool>("", "DisableYi", false,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 2 }));
+                        new ConfigurationManagerAttributes { Order = 4 }));
 
             hideCustomObject = Config.Bind<bool>("", "HideCustomPic", false,
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 2 }));
+                        new ConfigurationManagerAttributes { Order = 3 }));
 
             enableSkinKeyboardShortcut = Config.Bind("", "Enable Skin Shortcut",
                         new KeyboardShortcut(KeyCode.Q, KeyCode.LeftShift),
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 1 }));
+                        new ConfigurationManagerAttributes { Order = 2 }));
 
             customObjectShortcut = Config.Bind("", "Create Custom Picture Gif Shortcut",
                         new KeyboardShortcut(KeyCode.Q, KeyCode.LeftControl),
@@ -257,6 +257,9 @@ namespace SkinMod {
 
             hideCustomObject.Value = false;
 
+            if (path.Value == "")
+                return;
+
             try {
                 if (!GameObject.Find($"{SkinHolderPath}/customObject")) {
                     customObject = new GameObject("customObject");
@@ -265,7 +268,7 @@ namespace SkinMod {
                     customObject.transform.localPosition = new Vector3(Player.i.transform.position.x, Player.i.transform.position.y, Player.i.transform.position.z);
                     customObject.transform.SetParent(GameObject.Find($"{SkinHolderPath}").transform);
                     customObject.AddComponent<SpriteRenderer>();
-
+                    
                     customObject.GetComponent<SpriteRenderer>().sprite = testGif.LoadSprite(path.Value);
                     //Destroy(GameObject.Find($"{SkinHolderPath}/test"));
                 } else {
