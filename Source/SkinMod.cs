@@ -144,7 +144,7 @@ namespace SkinMod {
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 4 }));
 
-            orderLayer = Config.Bind<int>("", "orderLayer", 0,
+            orderLayer = Config.Bind<int>("", "orderLayer", 101,
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 3 }));
 
@@ -212,7 +212,7 @@ namespace SkinMod {
             testgif.testHook();
         }
 
-        void hideCustomObjcet(bool enable) {
+        void hideCustomObjcet(bool enable) {    
             if (GameObject.Find($"{SkinHolderPath}/customObject")) {
                 customObject = GameObject.Find($"{SkinHolderPath}/customObject");
                 customObject.SetActive(!enable);
@@ -255,7 +255,7 @@ namespace SkinMod {
 
             testgif.clear();
 
-            hideCustomObject.Value = true;
+            hideCustomObject.Value = false;
 
             try {
                 if (!GameObject.Find($"{SkinHolderPath}/customObject")) {
