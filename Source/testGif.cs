@@ -52,11 +52,14 @@ namespace SkinMod {
                 return cacheSprite[filePath];
             if (!File.Exists(filePath))
                 return null;
+
             var name = string.IsNullOrEmpty(specificName) ? Path.GetFileNameWithoutExtension(filePath) : specificName;
+
             if (mapGif.TryGetValue(name, out Gif gifFound)) {
                 gifFound.Reset();
                 return gifFound.Current;
             }
+
             var ext = Path.GetExtension(filePath).ToLower();
             if (ext == ".png" || ext == ".jpg" || ext == ".jpeg") {
                 byte[] data = File.ReadAllBytes(filePath);
@@ -66,10 +69,12 @@ namespace SkinMod {
                     SpriteDesc desc = SpriteDesc._default;
                     if (File.Exists(spriteJsonPath))
                         desc = JsonConvert.DeserializeObject<SpriteDesc>(File.ReadAllText(spriteJsonPath));
-                    Sprite sprite = Sprite.Create(tex2D, new Rect(0, 0, tex2D.width, tex2D.height), desc.pivot, desc.pixelsPerUnit, desc.extrude, desc.spriteType);
+
+                    // Set pivot to the center (0.5, 0.5)
+                    Sprite sprite = Sprite.Create(tex2D, new Rect(0, 0, tex2D.width, tex2D.height), new Vector2(0.5f, 0.5f), desc.pixelsPerUnit, desc.extrude, desc.spriteType);
                     sprite.name = name;
                     cacheSprite.Add(filePath, sprite);
-                    return sprite;  
+                    return sprite;
                 }
             } else if (ext == ".gif") {
                 byte[] data = File.ReadAllBytes(filePath);
@@ -85,8 +90,10 @@ namespace SkinMod {
                     while (img != null) {
                         tex2D = img.CreateTexture();
                         tex2D.name = name;
+
+                        // Set pivot to the center (0.5, 0.5)
                         SpriteDesc desc = SpriteDesc._default;
-                        Sprite sprite = Sprite.Create(tex2D, new Rect(0, 0, tex2D.width, tex2D.height), desc.pivot, desc.pixelsPerUnit, desc.extrude, desc.spriteType);
+                        Sprite sprite = Sprite.Create(tex2D, new Rect(0, 0, tex2D.width, tex2D.height), new Vector2(0.5f, 0.5f), desc.pixelsPerUnit, desc.extrude, desc.spriteType);
                         sprite.name = tex2D.name;
                         gif.frames.Add(sprite);
                         gif.delay.Add(img.Delay * 0.001f);
@@ -98,6 +105,7 @@ namespace SkinMod {
             }
             return null;
         }
+
 
         static void GifUpdate(Type t) {
             UnityEngine.Object[] renderers = UnityEngine.Object.FindObjectsOfType(t);
