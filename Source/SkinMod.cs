@@ -210,6 +210,10 @@ namespace SkinMod {
 
             testgif = new testGif();
             testgif.testHook();
+
+            _lineTexture = new Texture2D(1, 1); 
+            _lineTexture.SetPixel(0, 0, Color.white);
+            _lineTexture.Apply();
         }
 
         void hideCustomObjcet(bool enable) {    
@@ -238,6 +242,68 @@ namespace SkinMod {
 
         void Update() {
             onUpdate?.Invoke();
+        }
+        private Texture2D _lineTexture;
+
+
+        private void OnGUI() {
+            // Define the Camera from the GameObject path
+            Camera sceneCamera = GameObject.Find("A1_S2_GameLevel/CameraCore/DockObj/OffsetObj/ShakeObj/SceneCamera").GetComponent<Camera>();
+
+            // Get the screen position of the Player (assuming `Player.i.Center` is in world space)
+            //Vector2 screenPointB = sceneCamera.WorldToScreenPoint(Player.i.Center);
+
+            //// Calculate the top center of the screen
+            //Vector2 screenPointA = new Vector2(Screen.width / 2, Screen.height);
+
+            //// Flip the Y-coordinate for the `OnGUI()` system
+            //screenPointB.y = Screen.height - screenPointB.y;
+
+            // Draw the line from the top center to the playe   r
+            
+
+            var monsterDict = MonsterManager.Instance.monsterDict;
+
+            foreach (KeyValuePair<string, MonsterBase> kvp in monsterDict) {
+                string monsterName = kvp.Key; // The key (monster name)
+                MonsterBase monster = kvp.Value; // The value (MonsterBase object)
+
+                var dis = Vector3.Distance(SingletonBehaviour<GameCore>.Instance.player.transform.position, monster.transform.position);
+
+                if (dis > 300) continue;
+                if (monster.postureSystem.CurrentHealthValue < 0) continue;
+                if (monster.tag == "Trap") continue;
+                // Perform actions on each monster
+                Vector2 screenPointB = sceneCamera.WorldToScreenPoint(monster.transform.position);
+
+                // Calculate the top center of the screen
+                Vector2 screenPointA = new Vector2(Screen.width / 2, Screen.height);
+
+                // Flip the Y-coordinate for the `OnGUI()` system
+                screenPointB.y = Screen.height - screenPointB.y;
+                DrawLine(screenPointA, screenPointB, Color.red, 2f);
+                //ToastManager.Toast(monster.gameObject);
+                //ToastManager.Toast(monster.name);
+                // You can call methods or access properties on the monster object here
+            }
+        }
+
+        private void DrawLine(Vector2 pointA, Vector2 pointB, Color color, float thickness) {
+            Vector2 delta = pointB - pointA;
+            float angle = Mathf.Atan2(delta.y, delta.x) * Mathf.Rad2Deg;
+            float length = delta.magnitude;
+
+            // Set line color
+            GUI.color = color;
+
+            // Rotate and draw line texture
+            Matrix4x4 matrixBackup = GUI.matrix;
+            GUIUtility.RotateAroundPivot(angle, pointA);
+            GUI.DrawTexture(new Rect(pointA.x, pointA.y, length, thickness), _lineTexture);
+            GUI.matrix = matrixBackup;
+
+            // Reset GUI color
+            GUI.color = Color.white;
         }
 
         void UpdateCustom() {
