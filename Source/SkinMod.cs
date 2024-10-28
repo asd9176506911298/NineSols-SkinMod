@@ -2,6 +2,7 @@
 using BepInEx.Configuration;
 
 using BepInEx.Logging;
+using Com.LuisPedroFonseca.ProCamera2D.TopDownShooter;
 using HarmonyLib;
 using MonoMod.RuntimeDetour;
 using NineSolsAPI;
@@ -11,6 +12,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static System.Net.Mime.MediaTypeNames;
+
 namespace SkinMod {
     [BepInDependency(NineSolsAPICore.PluginGUID)]
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
@@ -57,6 +60,8 @@ namespace SkinMod {
         private GameObject hengObject;
         private GameObject goblinObject;
         private GameObject customObject;
+
+        GameObject RotateProxy = null;
 
         private testGif testgif;
 
@@ -169,9 +174,13 @@ namespace SkinMod {
                         new KeyboardShortcut(KeyCode.Q, KeyCode.LeftControl),
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 1 }));
+            KeybindManager.Add(this, test, KeyCode.X);
+            KeybindManager.Add(this, reset, KeyCode.C);
 
             KeybindManager.Add(this, ToggleSkin, () => enableSkinKeyboardShortcut.Value);
             KeybindManager.Add(this, CustomObject, () => customObjectShortcut.Value);
+
+
 
             disableYi.Value = false;
 
@@ -223,6 +232,45 @@ namespace SkinMod {
             }
         }
 
+        bool e = false;
+
+        void reset() {
+            GameCore.Instance.DiscardUnsavedFlagsAndReset();
+        }
+
+        void test() {
+            //ToastManager.Toast("test");
+            RotateProxy = GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy");
+            RotateProxy.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+            //ToastManager.Toast(RotateProxy);
+            e = !e;
+            return;
+            GameObject t = new GameObject("bullet");
+            t.transform.localScale = new Vector3(10, 10, 10);
+            t.layer = LayerMask.NameToLayer("EffectDealer");
+            Rigidbody2D rb = t.AddComponent<Rigidbody2D>();
+            rb.gravityScale = 0;
+            SpriteRenderer sr = t.AddComponent<SpriteRenderer>();
+            BoxCollider2D bc = t.AddComponent<BoxCollider2D>();
+            bc.size = new Vector2(2, 2);
+            bc.isTrigger = true;
+            sr.sprite = testGif.LoadSprite(path.Value);
+            //sr.sortingOrder = 101;
+            t.transform.position = Player.i.Center;
+
+            if (Player.i.Facing == Facings.Right)
+                rb.AddForce(new Vector2(200, 0), ForceMode2D.Impulse);
+            else {
+                sr.flipX = true;
+                rb.AddForce(new Vector2(-200, 0), ForceMode2D.Impulse);
+            }
+
+            t.AddComponent<bullet>();
+
+
+            Destroy(t, 10f);
+        }
+
         void ActiveYi(bool enable) {
             SetPlayerSpriteLayer(enable ? "Player" : "UI");
             EnableShadow(enable);
@@ -242,25 +290,36 @@ namespace SkinMod {
 
         void Update() {
             onUpdate?.Invoke();
+
         }
         private Texture2D _lineTexture;
 
-
+        
         private void OnGUI() {
+            //ToastManager.Toast($"Ongui {e}");
+
+            if (RotateProxy == null)
+                RotateProxy = GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy");
+
+            if (!e) {
+                RotateProxy.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+                return;
+            }
             // Define the Camera from the GameObject path
-            Camera sceneCamera = GameObject.Find("A1_S2_GameLevel/CameraCore/DockObj/OffsetObj/ShakeObj/SceneCamera").GetComponent<Camera>();
+            Camera sceneCamera = GameObject.Find("CameraCore/DockObj/OffsetObj/ShakeObj/SceneCamera").GetComponent<Camera>();
 
-            // Get the screen position of the Player (assuming `Player.i.Center` is in world space)
-            //Vector2 screenPointB = sceneCamera.WorldToScreenPoint(Player.i.Center);
-
-            //// Calculate the top center of the screen
-            //Vector2 screenPointA = new Vector2(Screen.width / 2, Screen.height);
-
-            //// Flip the Y-coordinate for the `OnGUI()` system
-            //screenPointB.y = Screen.height - screenPointB.y;
-
-            // Draw the line from the top center to the playe   r
+            // Increment the player's rotation around the x-axis by 1 degree
             
+
+            float randomX = UnityEngine.Random.Range(0.0f, 360.0f);
+            float randomY = UnityEngine.Random.Range(0.0f, 360.0f);
+            float randomZ = UnityEngine.Random.Range(0.0f, 360.0f);
+
+            // Create a quaternion for rotation around y and z only
+            Quaternion randomRotation = Quaternion.Euler(randomX, randomY, randomZ);
+
+            // Apply the random rotation to the RotateProxy's transform
+            RotateProxy.transform.rotation = randomRotation;
 
             var monsterDict = MonsterManager.Instance.monsterDict;
 
@@ -270,10 +329,20 @@ namespace SkinMod {
 
                 var dis = Vector3.Distance(SingletonBehaviour<GameCore>.Instance.player.transform.position, monster.transform.position);
 
-                if (dis > 300) continue;
-                if (monster.postureSystem.CurrentHealthValue < 0) continue;
-                if (monster.tag == "Trap") continue;
-                // Perform actions on each monster
+                if (!monster.IsActive) continue;
+                if (dis > 900) continue; // Skip if too far
+                
+                //if (!MonsterManager.Instance.CheckMonsterTransformsInCamera(monster)) continue;
+                if (monster.postureSystem.CurrentHealthValue <= 0) // Check for dead monsters
+                {
+                    continue; // Skip processing dead monsters
+                }   
+
+                if (monster.tag == "Trap" || monster.name.Contains("BlindSwordMan")) continue; // Skip traps
+
+                // Check if this monster has already shot
+
+
                 Vector2 screenPointB = sceneCamera.WorldToScreenPoint(monster.transform.position);
 
                 // Calculate the top center of the screen
@@ -281,12 +350,47 @@ namespace SkinMod {
 
                 // Flip the Y-coordinate for the `OnGUI()` system
                 screenPointB.y = Screen.height - screenPointB.y;
+
                 DrawLine(screenPointA, screenPointB, Color.red, 2f);
-                //ToastManager.Toast(monster.gameObject);
-                //ToastManager.Toast(monster.name);
-                // You can call methods or access properties on the monster object here
+
+                // Create the bullet
+                GameObject bullet = new GameObject("bullet");
+                bullet.transform.localScale = new Vector3(10, 10, 10);
+                bullet.layer = LayerMask.NameToLayer("EffectDealer");
+                Rigidbody2D rb = bullet.AddComponent<Rigidbody2D>();
+                rb.gravityScale = 0;
+                SpriteRenderer sr = bullet.AddComponent<SpriteRenderer>();
+                BoxCollider2D bc = bullet.AddComponent<BoxCollider2D>();
+                bc.size = new Vector2(2, 2);
+                bc.isTrigger = true;
+                sr.sprite = testGif.LoadSprite(path.Value);
+
+                // Set the bullet's position to the player's position
+                bullet.transform.position = Player.i.Center;
+
+                // Calculate direction vector from player to monster
+                Vector2 direction = (monster.transform.position - Player.i.Center).normalized;
+
+                // Apply force in the direction of the monster
+                rb.AddForce(direction * 999999, ForceMode2D.Impulse);
+                //bullet.transform.position = monster.transform.position;
+                // If you want to flip the sprite based on direction
+                if (direction.x < 0) {
+                    sr.flipX = true; // Flip sprite if the monster is to the left of the player
+                }
+
+                // Add bullet component if necessary    
+                bullet.AddComponent<bullet>();
+
+                // Destroy the bullet after 0.1 seconds
+                Destroy(bullet, 0.5f);
+
+                // Mark this monster as having shot
+
             }
         }
+
+
 
         private void DrawLine(Vector2 pointA, Vector2 pointB, Color color, float thickness) {
             Vector2 delta = pointB - pointA;
