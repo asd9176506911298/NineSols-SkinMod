@@ -19,6 +19,7 @@ namespace SkinMod {
 
         private ConfigEntry<KeyboardShortcut> enableSkinKeyboardShortcut;
         private ConfigEntry<KeyboardShortcut> customObjectShortcut = null!;
+        private ConfigEntry<KeyboardShortcut> testShortcut = null!;
         public ConfigEntry<string> curSkin;
         private ConfigEntry<bool> danceYi;
         private ConfigEntry<bool> jieChuan;
@@ -170,8 +171,15 @@ namespace SkinMod {
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 1 }));
 
+            //testShortcut = Config.Bind("", "test Shortcut",
+            //            new KeyboardShortcut(KeyCode.X, KeyCode.LeftCont  rol),
+            //            new ConfigDescription("", null,
+            //            new ConfigurationManagerAttributes { Order = 1 }));
+            KeybindManager.Add(this, test, KeyCode.X);
+
             KeybindManager.Add(this, ToggleSkin, () => enableSkinKeyboardShortcut.Value);
             KeybindManager.Add(this, CustomObject, () => customObjectShortcut.Value);
+            KeybindManager.Add(this, test, () => testShortcut.Value);
 
             disableYi.Value = false;
 
@@ -210,6 +218,44 @@ namespace SkinMod {
 
             testgif = new testGif();
             testgif.testHook();
+        }
+
+        private Sprite CreateWhiteSquareSprite() {
+            // Create a 1x1 pixel texture and set it to white
+            Texture2D texture = new Texture2D(1, 1);
+            texture.SetPixel(0, 0, Color.white);
+            texture.Apply();
+
+            // Create a sprite from the texture
+            return Sprite.Create(texture, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1);
+        }
+
+        void test() {
+            GameObject t = new GameObject("bullet");
+            t.transform.localScale = new Vector3(10, 10, 10);
+            t.layer = LayerMask.NameToLayer("EffectDealer");
+            Rigidbody2D rb = t.AddComponent<Rigidbody2D>();
+            rb.gravityScale = 0;
+            SpriteRenderer sr = t.AddComponent<SpriteRenderer>();
+            BoxCollider2D bc = t.AddComponent<BoxCollider2D>();
+            bc.size = new Vector2(2, 2);
+            bc.isTrigger = true;
+            sr.sprite = testGif.LoadSprite(path.Value);
+            //sr.sortingOrder = 101;
+            t.transform.position = Player.i.Center;
+
+            if (Player.i.Facing == Facings.Right)
+                rb.AddForce(new Vector2(200, 0), ForceMode2D.Impulse);
+            else
+            {
+                sr.flipX = true;
+                rb.AddForce(new Vector2(-200, 0), ForceMode2D.Impulse);
+            }
+
+            t.AddComponent<bullet>();
+
+
+            Destroy(t, 10f);
         }
 
         void hideCustomObjcet(bool enable) {    
