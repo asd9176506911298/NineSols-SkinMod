@@ -11,6 +11,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static UnityEngine.GraphicsBuffer;
+
 namespace SkinMod {
     [BepInDependency(NineSolsAPICore.PluginGUID)]
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
@@ -231,32 +233,67 @@ namespace SkinMod {
         }
 
         void test() {
-            GameObject t = new GameObject("bullet");
-            t.transform.localScale = new Vector3(10, 10, 10);
-            t.layer = LayerMask.NameToLayer("EffectDealer");
-            Rigidbody2D rb = t.AddComponent<Rigidbody2D>();
+            Player.i.hackDrone.stats.ControlRange = 5000000f;
+            Player.i.hackDrone.stats.MaxSpeed = 5000000f;
+            GameObject bullet = new GameObject("bullet");
+            bullet.transform.localScale = new Vector3(10, 10, 10);
+            bullet.layer = LayerMask.NameToLayer("EffectDealer");
+
+            Rigidbody2D rb = bullet.AddComponent<Rigidbody2D>();
             rb.gravityScale = 0;
-            SpriteRenderer sr = t.AddComponent<SpriteRenderer>();
-            BoxCollider2D bc = t.AddComponent<BoxCollider2D>();
+
+            SpriteRenderer sr = bullet.AddComponent<SpriteRenderer>();
+            BoxCollider2D bc = bullet.AddComponent<BoxCollider2D>();
             bc.size = new Vector2(2, 2);
             bc.isTrigger = true;
-            sr.sprite = testGif.LoadSprite(path.Value);
-            //sr.sortingOrder = 101;
-            t.transform.position = Player.i.Center;
 
-            if (Player.i.Facing == Facings.Right)
-                rb.AddForce(new Vector2(200, 0), ForceMode2D.Impulse);
-            else
-            {
-                sr.flipX = true;
-                rb.AddForce(new Vector2(-200, 0), ForceMode2D.Impulse);
+            sr.sprite = testGif.LoadSprite(path.Value);
+            bullet.transform.position = Player.i.hackDrone.transform.position;
+
+            Vector2 direction;
+            float forceAmount = 200f;
+            float closestDistance = float.MaxValue;
+            Transform closestMonsterTransform = null;
+
+            // Iterate over all monsters and apply filtering conditions
+            foreach (KeyValuePair<string, MonsterBase> kvp in MonsterManager.Instance.monsterDict) {
+                MonsterBase monster = kvp.Value;
+
+                // Skip inactive, far away, dead, or excluded monsters
+                if (!monster.IsActive) continue;
+                if (monster.postureSystem.CurrentHealthValue <= 0) continue;
+                if (monster.tag == "Trap" || monster.name.Contains("BlindSwordMan")) continue;
+
+                float distanceToPlayer = Vector3.Distance(SingletonBehaviour<GameCore>.Instance.player.hackDrone.transform.position, monster.transform.position);
+                if (distanceToPlayer > 300) continue; // Skip if too far
+
+                // Find the closest monster that meets the conditions
+                float distanceToBullet = Vector3.Distance(bullet.transform.position, monster.transform.position);
+                if (distanceToBullet < closestDistance) {
+                    closestDistance = distanceToBullet;
+                    closestMonsterTransform = monster.transform;
+                }
             }
 
-            t.AddComponent<bullet>();
+            // If no valid monster is within range, destroy the bullet and exit
+            if (closestMonsterTransform == null) {
+                Debug.Log("No valid monster within range; bullet will not be fired.");
+                Destroy(bullet);
+                return;
+            }
 
+            // Determine the direction based on the closest valid monster or player facing
+            direction = (closestMonsterTransform.position - bullet.transform.position).normalized;
+            Debug.Log("Applying force towards closest monster: " + direction);
 
-            Destroy(t, 10f);
+            // Apply force to the bullet in the determined direction
+            rb.AddForce(direction * forceAmount, ForceMode2D.Impulse);
+
+            // Add bullet behavior and set destruction timer
+            bullet.AddComponent<bullet>();
+            Destroy(bullet, 1f); // Destroy the bullet after 1 second
         }
+
 
         void hideCustomObjcet(bool enable) {    
             if (GameObject.Find($"{SkinHolderPath}/customObject")) {

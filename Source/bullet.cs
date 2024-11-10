@@ -28,7 +28,7 @@ namespace SkinMod {
             if (collision.tag == "Enemy" && collision.GetComponentInParent<MonsterBase>()) {
                 //ToastManager.Toast("Enter");
                 MonsterBase monsterbase = collision.GetComponentInParent<MonsterBase>();
-                monsterbase.DecreasePostureByDOT(500);
+                monsterbase.DecreasePostureByDOT(100);
                 Destroy(gameObject);
             }
         }
