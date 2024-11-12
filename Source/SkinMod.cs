@@ -10,6 +10,7 @@ using NineSolsAPI.Utils;
 using RCGFSM.PlayerAbility;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using static System.Net.Mime.MediaTypeNames;
@@ -175,7 +176,12 @@ namespace SkinMod {
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 1 }));
             KeybindManager.Add(this, test, KeyCode.X);
-            KeybindManager.Add(this, reset, KeyCode.C);
+
+            KeybindManager.Add(this, p1, KeyCode.Keypad1);
+            KeybindManager.Add(this, p2, KeyCode.Keypad2);
+            KeybindManager.Add(this, p3, KeyCode.Keypad3);
+            KeybindManager.Add(this, p4, KeyCode.Keypad4);
+            //KeybindManager.Add(this, reset, KeyCode.C);
 
             KeybindManager.Add(this, ToggleSkin, () => enableSkinKeyboardShortcut.Value);
             KeybindManager.Add(this, CustomObject, () => customObjectShortcut.Value);
@@ -238,7 +244,102 @@ namespace SkinMod {
             GameCore.Instance.DiscardUnsavedFlagsAndReset();
         }
 
+        void p1() {
+            foreach (var x in MonsterManager.Instance.monsterDict) {
+                if(x.Value.tag == "Boss") {
+                    GotoPhase(x.Value, 0);
+                    ToastManager.Toast($"Goto Phase1 Name:{x.Value} {x.Value.PhaseIndex}");
+                }
+            }
+        }
+
+        void p2() {
+            foreach (var x in MonsterManager.Instance.monsterDict) {
+                if (x.Value.tag == "Boss") {
+                    GotoPhase(x.Value, 1);
+                    ToastManager.Toast($"Goto Phase2 Name:{x.Value}");
+                }
+            }
+        }
+
+        void p3() {
+            foreach (var x in MonsterManager.Instance.monsterDict) {
+                if (x.Value.tag == "Boss") {
+                    GotoPhase(x.Value, 2);
+                    ToastManager.Toast($"Goto Phase3 Name:{x.Value}");
+                }
+            }
+        }
+
+
+        void p4() {
+            foreach (var x in MonsterManager.Instance.monsterDict) {
+                if (x.Value.tag == "Boss") {
+                    var monsterStatField = typeof(MonsterBase).GetField("monsterStat")
+                                       ?? typeof(MonsterBase).GetField("_monsterStat");
+                    if (monsterStatField != null) {
+                        var monsterStat = monsterStatField.GetValue(x.Value) as MonsterStat; // Assuming MonsterStat is the type of the field
+                        monsterStat.IsLockPostureInvincible = !monsterStat.IsLockPostureInvincible;
+                        ToastManager.Toast($"Invincible:{monsterStat.IsLockPostureInvincible} Name:{x.Value}");
+                    }
+                }
+            }
+        }
+
+        void GotoPhase(MonsterBase m, int index) {
+            m.PhaseIndex = index;
+            m.animator.SetInteger(Animator.StringToHash("PhaseIndex"), m.PhaseIndex);
+            m.postureSystem.RestorePosture();
+            m.monsterCore.EnablePushAway();
+            if (SingletonBehaviour<GameCore>.Instance.monsterHpUI.CurrentBossHP != null) {
+                SingletonBehaviour<GameCore>.Instance.monsterHpUI.CurrentBossHP.TempShow();
+            }
+            m.monsterCore.DisablePushAway();
+            for (int i = 0; i < m.attackSensors.Count; i++) {
+                if (m.attackSensors[i] != null) {
+                    m.attackSensors[i].ClearQueue();
+                }
+            }
+            m.VelX = 0f;
+        }
+
         void test() {
+
+            AnimationMotionRebind[] rootObjects = GameObject.FindObjectsOfType<AnimationMotionRebind>();
+
+            // Iterate through all found AnimationMotionRebind components
+            foreach (AnimationMotionRebind rootObject in rootObjects) {
+                // 1. Check if the rootObject is the one with the Animator
+                if (rootObject.name == "Animator") {
+                    // Get the Animator component and disable it
+                    Animator animator = rootObject.GetComponent<Animator>();
+                    if (animator != null) {
+                        animator.enabled = false; // Disable the Animator component
+                        Debug.Log("Disabled Animator on: " + rootObject.name);
+                    }
+
+                    // 2. Find AbstractRoot once
+                    Transform abstractRootTransform = rootObject.transform.Find("AbstractRoot");
+
+                    // If AbstractRoot exists, set it and its children active
+                    if (abstractRootTransform != null) {
+                        // Enable AbstractRoot and all its children
+                        abstractRootTransform.gameObject.SetActive(true);
+                        Debug.Log("Enabled AbstractRoot: " + abstractRootTransform.name);
+
+                        foreach (Transform child in abstractRootTransform) {
+                            child.gameObject.SetActive(true); // Set each child active
+                            if(child.name == "Body")
+                                child.GetComponent<SpriteRenderer>().sortingOrder = 1;
+                            Debug.Log("Enabled child of AbstractRoot: " + child.name);
+                        }
+                    } else {
+                        Debug.LogWarning("AbstractRoot not found in " + rootObject.name);
+                    }
+                }
+            }
+
+            return;
             //ToastManager.Toast("test");
             RotateProxy = GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy");
             RotateProxy.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
@@ -290,14 +391,55 @@ namespace SkinMod {
 
         void Update() {
             onUpdate?.Invoke();
+            return;
+            GameObject[] rootObjects = GameObject.FindObjectsOfType<GameObject>();
 
-        }
+            // Iterate through all found GameObjects
+            foreach (GameObject rootObject in rootObjects) {
+                if (rootObject.name == "Animator") {
+                    // Disable the Animator component
+                    Animator animator = rootObject.GetComponent<Animator>();
+                    if (animator != null) {
+                        animator.enabled = false;
+                    }
+                }
+
+                // Check if the GameObject name is "AbstractRoot"
+                if (rootObject.name == "AbstractRoot") {
+                    // Set the "AbstractRoot" GameObject active
+                    rootObject.SetActive(true);
+
+                    // Iterate over all children of the "AbstractRoot" GameObject
+                    foreach (Transform child in rootObject.transform) {
+                        // Set each child GameObject active
+                        child.gameObject.SetActive(true);
+
+                        // Optionally, you can also do something else with each child here
+                        Debug.Log("Setting child active: " + child.name);
+                    }
+                }
+
+                // If you need to disable the Animator component of another object named "Animator"
+                
+            }
+    }
         private Texture2D _lineTexture;
 
         
         private void OnGUI() {
             //ToastManager.Toast($"Ongui {e}");
+            //Camera sceneCamera = GameObject.Find("CameraCore/DockObj/OffsetObj/ShakeObj/SceneCamera").GetComponent<Camera>();
+            //Vector2 screenPointB = sceneCamera.WorldToScreenPoint(monster.transform.position);
 
+            //// Calculate the top center of the screen
+            //Vector2 screenPointA = new Vector2(Screen.width / 2, Screen.height);
+
+            //// Flip the Y-coordinate for the `OnGUI()` system
+            //screenPointB.y = Screen.height - screenPointB.y;
+
+            //DrawLine(screenPointA, screenPointB, Color.red, 2f);
+
+            return;
             if (RotateProxy == null)
                 RotateProxy = GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy");
 

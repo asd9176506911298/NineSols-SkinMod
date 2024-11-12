@@ -29,6 +29,9 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Reference Include="AK.Wwise.Unity.API">
+          <HintPath>..\..\..\Games\Nine Sols1030\NineSols_Data\Managed\AK.Wwise.Unity.API.dll</HintPath>
+        </Reference>
         <Reference Include="Assembly-CSharp">
             <HintPath>$(NineSolsPath)/NineSols_Data/Managed/Assembly-CSharp.dll</HintPath>
         </Reference>

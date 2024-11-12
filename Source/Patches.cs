@@ -115,4 +115,41 @@ public class Patches {
 
         return true; // the original method should be executed
     }
+
+    [HarmonyPrefix, HarmonyPatch(typeof(ChangeSceneTrigger), "OnTriggerEnter2D")]
+    public static bool ChangeSceneTrigger(ref ChangeSceneTrigger __instance, Collider2D collision) {
+        ToastManager.Toast(GetFullPath(__instance.gameObject));
+
+
+        return true;
+    }
+
+    static string GetFullPath(GameObject obj) {
+        string path = obj.name;
+        Transform parent = obj.transform.parent;
+
+        while (parent != null) {
+            path = parent.name + "/" + path;
+            parent = parent.parent;
+        }
+        return path;
+    }
+
+    //   [HarmonyPatch(typeof(SoundManager), "PlaySound", 
+    //    new Type[] { typeof(string), typeof(GameObject), typeof(AkCallbackManager.EventCallback) })]
+    //public class SoundManagerPatch
+    //{
+    //    [HarmonyPrefix]
+    //    public static bool PlaySound(ref uint __result, ref string soundName, GameObject soundEmitter, AkCallbackManager.EventCallback endCallback)
+    //    {
+    //        // Display a toast message with the sound name
+    //        //ToastManager.Toast(soundName);
+    //        if (soundName.Contains("Hurt") || soundName.Contains("CharSFX_ChargeParry_Success") || soundName.Contains("Reflect") || soundName.Contains("Player_SFX_FooExplode") || soundName.Contains("Player_SFX_NonPerfectParry")) {
+    //            soundName = "VO_YiGong_Emotion_Confuse_v2";
+    //        }
+
+    //        // Returning true allows the original PlaySound method to execute
+    //        return true;
+    //    }
+    //}
 }
