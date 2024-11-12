@@ -9,6 +9,7 @@ using NineSolsAPI.Utils;
 using RCGFSM.PlayerAbility;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 namespace SkinMod {
@@ -19,6 +20,7 @@ namespace SkinMod {
 
         private ConfigEntry<KeyboardShortcut> enableSkinKeyboardShortcut;
         private ConfigEntry<KeyboardShortcut> customObjectShortcut = null!;
+        private ConfigEntry<KeyboardShortcut> test = null!;
         public ConfigEntry<string> curSkin;
         private ConfigEntry<bool> danceYi;
         private ConfigEntry<bool> jieChuan;
@@ -170,8 +172,14 @@ namespace SkinMod {
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 1 }));
 
+            test = Config.Bind("", "TEST",
+                        new KeyboardShortcut(KeyCode.X, KeyCode.LeftControl),
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 1 }));
+
             KeybindManager.Add(this, ToggleSkin, () => enableSkinKeyboardShortcut.Value);
             KeybindManager.Add(this, CustomObject, () => customObjectShortcut.Value);
+            KeybindManager.Add(this, Test, () => test.Value);
 
             disableYi.Value = false;
 
@@ -210,6 +218,57 @@ namespace SkinMod {
 
             testgif = new testGif();
             testgif.testHook();
+        }
+
+        void Test() {
+            ToastManager.Toast("123");
+            GameObject.Find("GameCore(Clone)/RCG LifeCycle/UIManager/GameplayUICamera/Always Canvas/DialoguePlayer(KeepThisEnable)").GetComponent<Canvas>().enabled = false;
+            GameObject.Find("GameCore(Clone)/RCG LifeCycle/UIManager/GameplayUICamera/Always Canvas/DialoguePlayer(KeepThisEnable)/BackgroundCanvas").active = false;
+            //GameObject.Find("GameCore(Clone)/RCG LifeCycle/UIManager/GameplayUICamera/Always Canvas/DialoguePlayer(KeepThisEnable)/DialoguePanel").transform.localPosition = new Vector3(0, 100, 0);
+
+            CaptureScreenshot();
+        }
+        Camera cameraToUse;
+        void CaptureScreenshot() {
+            // Find the camera dynamically if not set in inspector
+            if (cameraToUse == null) {
+                cameraToUse = GameObject.Find("GameCore(Clone)/RCG LifeCycle/UIManager/GameplayUICamera").GetComponent<Camera>();
+            }
+
+            // Set the desired resolution (3840x2160)
+            int width = 3840;
+            int height = 2160;
+
+            // Create a RenderTexture with the desired resolution
+            RenderTexture rt = new RenderTexture(width, height, 24);
+            cameraToUse.targetTexture = rt;
+
+            // Set the background to transparent
+            cameraToUse.clearFlags = CameraClearFlags.SolidColor;
+            cameraToUse.backgroundColor = new Color(0, 0, 0, 0); // Fully transparent
+
+            // Render the object to the RenderTexture
+            RenderTexture.active = rt;
+            cameraToUse.Render();
+
+            // Create a Texture2D to read pixels from the RenderTexture
+            Texture2D screenshot = new Texture2D(width, height, TextureFormat.RGBA32, false);
+            screenshot.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+            screenshot.Apply();
+
+            // Convert the texture to PNG
+            byte[] bytes = screenshot.EncodeToPNG();
+
+            // Save the PNG to file
+            string path = Path.Combine(Application.dataPath, "Screenshot.png");
+            File.WriteAllBytes(path, bytes);
+
+            // Clean up
+            cameraToUse.targetTexture = null;
+            RenderTexture.active = null;
+            Destroy(rt);
+
+            Debug.Log("Screenshot saved to: " + path);
         }
 
         void hideCustomObjcet(bool enable) {    
