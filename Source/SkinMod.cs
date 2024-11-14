@@ -5,22 +5,31 @@ using BepInEx.Logging;
 using Com.LuisPedroFonseca.ProCamera2D.TopDownShooter;
 using HarmonyLib;
 using MonoMod.RuntimeDetour;
+using Newtonsoft.Json.Linq;
 using NineSolsAPI;
 using NineSolsAPI.Utils;
 using RCGFSM.PlayerAbility;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using static System.Net.Mime.MediaTypeNames;
+using System;
+using System.Reflection;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace SkinMod {
     [BepInDependency(NineSolsAPICore.PluginGUID)]
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
     public class SkinMod : BaseUnityPlugin {
         public static SkinMod Instance { get; private set; }
+
+        HashSet<ScriptableObject> uniqueDropTables = new HashSet<ScriptableObject>();
 
         private ConfigEntry<KeyboardShortcut> enableSkinKeyboardShortcut;
         private ConfigEntry<KeyboardShortcut> customObjectShortcut = null!;
@@ -179,7 +188,7 @@ namespace SkinMod {
             KeybindManager.Add(this, test, KeyCode.X);
 
             KeybindManager.Add(this, p1, KeyCode.Keypad1);
-            //KeybindManager.Add(this, p2, KeyCode.Keypad2);
+            KeybindManager.Add(this, p2, KeyCode.Keypad2);
             //KeybindManager.Add(this, p3, KeyCode.Keypad3);
             //KeybindManager.Add(this, p4, KeyCode.Keypad4);
             //KeybindManager.Add(this, reset, KeyCode.C);
@@ -245,7 +254,36 @@ namespace SkinMod {
             GameCore.Instance.DiscardUnsavedFlagsAndReset();
         }
 
+
+        bool disable = false;
         void p1() {
+            ToastManager.Toast("p1");
+
+            ScriptableObjectSaver s = new ScriptableObjectSaver();
+            s.SaveAllScriptableObjectsAsJson();
+
+
+
+
+
+            //foreach (var x in GameObject.FindObjectsOfType<BossGeneralState>()) {
+            //    if (!(x.name.Contains("[")) || x.name.Contains("Teleport")) {
+            //        if (x.name == "TeleportOut")
+            //            continue;
+            //        ToastManager.Toast($"{x} {x.AnimationSpeed}");
+            //        x.OverideAnimationSpeed = true;
+            //        x.AnimationSpeed = 10;
+            //        x.OverideAnimationSpeed = false;
+            //    }
+            //}
+
+            //var state = GameObject.Find("Boss_Yi Gung/States");
+            //state.transform.Find("HurtState").gameObject.SetActive(disable);
+            //state.transform.Find("AttackParrying").gameObject.SetActive(disable);
+            //state.transform.Find("PostureBreak").gameObject.SetActive(disable);
+            //state.transform.Find("Hurt_BigState").gameObject.SetActive(disable);
+            //disable = !disable;
+
             //var tri = GameObject.Find("GameLevel/Room/Prefab/EventBinder/General Boss Fight FSM Object Variant/FSM Animator/LogicRoot/---Boss---/Boss_Yi Gung/States/Attacks/[13] Tripple Poke 三連");
 
             //foreach (var x in tri.transform.Find("weight").GetComponent<LinkNextMoveStateWeight>().stateWeightList) {
@@ -286,36 +324,36 @@ namespace SkinMod {
 
 
             //[6] double attack
-            var attacksPath = "GameLevel/Room/Prefab/EventBinder/General Boss Fight FSM Object Variant/FSM Animator/LogicRoot/---Boss---/Boss_Yi Gung/States";
-            var attacksParent = GameObject.Find(attacksPath);
+            //var attacksPath = "GameLevel/Room/Prefab/EventBinder/General Boss Fight FSM Object Variant/FSM Animator/LogicRoot/---Boss---/Boss_Yi Gung/States";
+            //var attacksParent = GameObject.Find(attacksPath);
 
-            if (attacksParent != null) {
-                for (int i = 0; i < attacksParent.transform.childCount; i++) {
-                    var attackChild = attacksParent.transform.GetChild(i);
+            //if (attacksParent != null) {
+            //    for (int i = 0; i < attacksParent.transform.childCount; i++) {
+            //        var attackChild = attacksParent.transform.GetChild(i);
 
-                    // Loop through each child under attackChild
-                    for (int z = 0; z < attackChild.transform.childCount; z++) {
-                        var weights = attackChild.transform.GetChild(z);
-                        var linkNextMoveStateWeight = weights.GetComponent<LinkNextMoveStateWeight>();
+            //        // Loop through each child under attackChild
+            //        for (int z = 0; z < attackChild.transform.childCount; z++) {
+            //            var weights = attackChild.transform.GetChild(z);
+            //            var linkNextMoveStateWeight = weights.GetComponent<LinkNextMoveStateWeight>();
 
-                        // Check if the component exists to avoid null reference exceptions
-                        if (linkNextMoveStateWeight != null) {
-                            // Retrieve names of the immediate parent and its parent
-                            string firstParentName = attackChild.name;
-                            string secondParentName = attackChild.parent != null ? attackChild.parent.name : "No Parent";
+            //            // Check if the component exists to avoid null reference exceptions
+            //            if (linkNextMoveStateWeight != null) {
+            //                // Retrieve names of the immediate parent and its parent
+            //                string firstParentName = attackChild.name;
+            //                string secondParentName = attackChild.parent != null ? attackChild.parent.name : "No Parent";
 
-                            // Loop through mustUseStates and prepare the "mustUseInStart" part
-                            string mustUseInStart = string.Join(", ", linkNextMoveStateWeight.mustUseStates.Select(c => $"mustUseInStart:{{{c}}}"));
+            //                // Loop through mustUseStates and prepare the "mustUseInStart" part
+            //                string mustUseInStart = string.Join(", ", linkNextMoveStateWeight.mustUseStates.Select(c => $"mustUseInStart:{{{c}}}"));
 
-                            foreach (var x in linkNextMoveStateWeight.stateWeightList) {
-                                ToastManager.Toast($"{firstParentName}/{secondParentName}/{weights.name}, Name: {x.State}, Weight: {x.weight}, {mustUseInStart}");
-                            }
-                        }
-                    }
-                }
-            } else {
-                ToastManager.Toast("Attacks parent not found.");
-            }
+            //                foreach (var x in linkNextMoveStateWeight.stateWeightList) {
+            //                    ToastManager.Toast($"{firstParentName}/{secondParentName}/{weights.name}, Name: {x.State}, Weight: {x.weight}, {mustUseInStart}");
+            //                }
+            //            }
+            //        }
+            //    }
+            //} else {
+            //    ToastManager.Toast("Attacks parent not found.");
+            //}
 
 
 
@@ -353,6 +391,11 @@ namespace SkinMod {
 
         void p2() {
             foreach (var x in MonsterManager.Instance.monsterDict) {
+                x.Value.ChangeStateIfValid(MonsterBase.States.Attack16);
+
+            }
+            return;
+            foreach (var x in MonsterManager.Instance.monsterDict) {
                 if (x.Value.tag == "Boss") {
                     GotoPhase(x.Value, 1);
                     ToastManager.Toast($"Goto Phase2 Name:{x.Value}");
@@ -361,6 +404,7 @@ namespace SkinMod {
         }
 
         void p3() {
+            return;
             foreach (var x in MonsterManager.Instance.monsterDict) {
                 if (x.Value.tag == "Boss") {
                     GotoPhase(x.Value, 2);
@@ -402,7 +446,11 @@ namespace SkinMod {
         }
 
         void test() {
-
+            foreach (var x in MonsterManager.Instance.monsterDict) {
+                x.Value.ChangeStateIfValid(MonsterBase.States.Attack4);
+                
+            }
+            return;
             AnimationMotionRebind[] rootObjects = GameObject.FindObjectsOfType<AnimationMotionRebind>();
 
             // Iterate through all found AnimationMotionRebind components

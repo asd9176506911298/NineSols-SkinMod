@@ -4,6 +4,7 @@ using NineSolsAPI;
 using RCGFSM.Projectiles;
 using RCGMaker.Core;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using static Linefy.PolygonalMesh;
@@ -134,6 +135,49 @@ public class Patches {
         }
         return path;
     }
+
+    //[HarmonyPrefix, HarmonyPatch(typeof(BossGeneralState), "OnAnimationMove")]
+    //public static bool OnAnimationMove(ref BossGeneralState __instance, ref Vector3 delta) {
+    //    //ToastManager.Toast(__instance);
+    //    var multipliers = new Dictionary<string, float>
+    //   {
+    //        { "[13] Tripple Poke 三連", 2.3f },
+    //        { "[17] DownAttack Danger 空中下危", 2f },
+    //        { "[14] FooExplode Smash 下砸紅球", 2.5f },
+    //        { "[11] GiantChargeWave 紅白白紅", 3.0f },
+    //        { "[1] Starter Slow Attack 慢刀前揮", 1.3f },
+    //        { "[3] Thrust Delay 一閃", 1.3f },
+    //        { "[6] Double Attack", 1.0f },
+    //        { "[16] QuickFoo", 1f },
+    //        { "[4] Slash Up 上撈下打 大反危", 2f }
+    //    };
+
+    //    // Default multipliers for delta.x
+    //    float defaultXMultiplier = 3.5f;
+
+    //    if (multipliers.TryGetValue(__instance.name, out float multiplier)) {
+    //        delta.x *= multiplier;
+    //    } else {
+    //        delta.x *= defaultXMultiplier;
+    //    }
+
+
+    //    //[17] DownAttack Danger 空中下危
+    //    //[3] Thrust Delay 一閃
+    //    return true;
+    //}
+
+
+    //[HarmonyPatch(typeof(MonsterBase), "ChangeStateIfValid", new Type[] { typeof(MonsterBase.States), typeof(MonsterBase.States)})]
+    //[HarmonyPrefix]
+    //public static bool Prefix(MonsterBase.States targetState, MonsterBase.States invalideHandle) {
+    //    ToastManager.Toast($"{targetState}");
+    //    if(targetState == MonsterBase.States.Hurt || targetState == MonsterBase.States.Hurt_Big || targetState == MonsterBase.States.PostureBreak || targetState == MonsterBase.States.AttackParrying1) {
+    //        return false;
+    //    }
+    //    return true; // Allow the original method to execute
+    //}
+
 
     //   [HarmonyPatch(typeof(SoundManager), "PlaySound", 
     //    new Type[] { typeof(string), typeof(GameObject), typeof(AkCallbackManager.EventCallback) })]
