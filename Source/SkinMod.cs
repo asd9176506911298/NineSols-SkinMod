@@ -69,87 +69,87 @@ namespace SkinMod {
 
             harmony = Harmony.CreateAndPatchAll(typeof(Patches).Assembly);
 
-            curSkin = Config.Bind<string>("", "currSkin", "",
-            new ConfigDescription("", null,
-            new ConfigurationManagerAttributes { Order = 24 }));
+            // Skin settings (higher order numbers appear first)
+            danceYi = Config.Bind<bool>("Skin", "DanceYi", true,
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 24 }));
 
-            niko = Config.Bind<bool>("", "Niko", true,
+            niko = Config.Bind<bool>("Skin", "Niko", true,
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 23 }));
 
-            danceYi = Config.Bind<bool>("", "DanceYi", true,
-                        new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 23 }));
-
-            jieChuan = Config.Bind<bool>("", "JieChuan", false,
+            jieChuan = Config.Bind<bool>("Skin", "JieChuan", false,
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 22 }));
 
-            usagi = Config.Bind<bool>("", "Usagi", false,
+            usagi = Config.Bind<bool>("Skin", "Usagi", false,
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 21 }));
 
-            jee = Config.Bind<bool>("", "Jee", false,
+            jee = Config.Bind<bool>("Skin", "Jee", false,
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 20 }));
 
-            heng = Config.Bind<bool>("", "Heng", false,
+            heng = Config.Bind<bool>("Skin", "Heng", false,
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 19 }));
 
-            goblin = Config.Bind<bool>("", "Goblin", false,
+            goblin = Config.Bind<bool>("Skin", "Goblin", false,
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 18 }));
 
-            attackEffect = Config.Bind<bool>("", "AttackEffect", false,
+            attackEffect = Config.Bind<bool>("Skin", "AttackEffect", false,
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 17 }));
 
-            path = Config.Bind<string>("", "path", "",
+            // Custom Pic Gif settings
+            path = Config.Bind<string>("Custom Pic Gif", "path", "",
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 16 }));
 
-            pos = Config.Bind<Vector3>("", "Position", Vector3.zero,
+            pos = Config.Bind<Vector3>("Custom Pic Gif", "Position", Vector3.zero,
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 15 }));
 
-       
+            scale = Config.Bind<Vector3>("Custom Pic Gif", "Scale", new Vector3(10f, 10f, 10f),
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 14 }));
 
-            scale = Config.Bind<Vector3>("", "Scale", new Vector3(10f,10f,10f),
+            rotate = Config.Bind<Vector3>("Custom Pic Gif", "Rotate", Vector3.zero,
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 13 }));
+
+            orderLayer = Config.Bind<int>("Custom Pic Gif", "orderLayer", 101,
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 12 }));
 
-        
+            gifSpeed = Config.Bind<float>("Custom Pic Gif", "GifSpeed", 1f,
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 11 }));
 
-            rotate = Config.Bind<Vector3>("", "Rotate", Vector3.zero,
+            disableYi = Config.Bind<bool>("Custom Pic Gif", "DisableYi", false,
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 10 }));
+
+            hideCustomObject = Config.Bind<bool>("Custom Pic Gif", "HideCustomPic", false,
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 9 }));
 
-            orderLayer = Config.Bind<int>("", "orderLayer", 101,
-                        new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 6 }));
-
-            gifSpeed = Config.Bind<float>("", "GifSpeed", 1f,
-                        new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 5 }));
-
-            disableYi = Config.Bind<bool>("", "DisableYi", false,
-                        new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 4 }));
-
-            hideCustomObject = Config.Bind<bool>("", "HideCustomPic", false,
-                        new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 3 }));
-
+            // General settings
             enableSkinKeyboardShortcut = Config.Bind("", "Enable Skin Shortcut",
                         new KeyboardShortcut(KeyCode.Q, KeyCode.LeftShift),
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 2 }));
+                        new ConfigurationManagerAttributes { Order = 8 }));
 
             customObjectShortcut = Config.Bind("", "Create Custom Picture Gif Shortcut",
                         new KeyboardShortcut(KeyCode.Q, KeyCode.LeftControl),
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 1 }));
+                        new ConfigurationManagerAttributes { Order = 7 }));
+
+            curSkin = Config.Bind<string>("", "currSkin", "",
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 6 }));
+
 
             KeybindManager.Add(this, ToggleSkin, () => enableSkinKeyboardShortcut.Value);
             KeybindManager.Add(this, CustomObject, () => customObjectShortcut.Value);
@@ -195,6 +195,8 @@ namespace SkinMod {
                 customObject.SetActive(!enable);
             }
         }
+
+
 
         void ActiveYi(bool enable) {
             SetPlayerSpriteLayer(enable ? "Player" : "UI");
