@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
+using Cysharp.Threading.Tasks;
 using HarmonyLib;
 using NineSolsAPI;
 using System.IO;
@@ -45,16 +46,44 @@ namespace SkinMod {
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
 
-        void test() {
-            ToastManager.Toast("123");
-            if (GameCore.Instance != null) {
-                foreach (var x in GameCore.Instance.allScenes) {
-                    //ToastManager.Toast(x);
-                    SceneManager.LoadScene(x);
-                }
-            }
-            //SceneManager.LoadScene("A1_S2_ConnectionToElevator_Final");
+        private async UniTask waitPlaying() {
 
+            while (true) {
+                if (GameCore.Instance != null) {
+                    if(GameCore.Instance.currentCoreState == GameCore.GameCoreState.Playing)
+                    break;
+                }
+
+                await UniTask.Yield();
+            }
+        }
+
+        void test() {
+            //ToastManager.Toast("123");
+            //if (GameCore.Instance != null) {
+            //    foreach (var x in GameCore.Instance.allScenes) {
+            //        ToastManager.Toast(x);
+            //        //SceneManager.LoadScene(x);
+            //    }
+            //}
+            //SceneManager.LoadScene("A1_S2_ConnectionToElevator_Final");
+            //foreach (var x in Resources.FindObjectsOfTypeAll<Note>()) {
+            //    ToastManager.Toast(x);
+            //}
+            //string filePath = Path.Combine("E:\\Games\\note", $"{"ResourceNote"}.txt");
+            //using (StreamWriter writer = new StreamWriter(filePath, false)) {
+            //    // Write scene name to the file
+
+            //    // Loop through all Note objects in the scene and write their details to the file
+            //    foreach (var x in Resources.FindObjectsOfTypeAll<Note>()) {
+            //        writer.WriteLine($"Note:{x.note}");
+            //        writer.WriteLine($"Path:{GetGameObjectPath(x.gameObject)}\n");
+            //    }
+            //}
+            //SceneManager.LoadScene("VR_Challenge_Hub");
+            foreach (var x in GameObject.FindObjectsOfType<Note>()) {
+                ToastManager.Toast(x.note);
+            }
         }
 
         string GetGameObjectPath(GameObject obj) {
@@ -70,9 +99,12 @@ namespace SkinMod {
         }
 
         void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
+            return;
             // Create a file path using the scene name
             string filePath = Path.Combine("E:\\Games\\note", $"{ scene.name}.txt");
-
+            
+            waitPlaying();
+            
             // Create or open the file for writing
             using (StreamWriter writer = new StreamWriter(filePath, false)) {
                 // Write scene name to the file
