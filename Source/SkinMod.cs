@@ -29,19 +29,14 @@ namespace SkinMod {
         private ConfigEntry<bool> niko;
         private ConfigEntry<bool> attackEffect;
         private ConfigEntry<string> path;
-        private ConfigEntry<float> x;
-        private ConfigEntry<float> y;
-        private ConfigEntry<float> z;
-        private ConfigEntry<float> scaleX;
-        private ConfigEntry<float> scaleY;
-        private ConfigEntry<float> scaleZ;
-        private ConfigEntry<float> rotateX;
-        private ConfigEntry<float> rotateY;
-        private ConfigEntry<float> rotateZ;
+        private ConfigEntry<Vector3> pos;
+        private ConfigEntry<Vector3> scale;
+        private ConfigEntry<Vector3> rotate;
         private ConfigEntry<int> orderLayer;
         private ConfigEntry<float> gifSpeed;
         private ConfigEntry<bool> disableYi;
         private ConfigEntry<bool> hideCustomObject;
+        private ConfigEntry<Vector3> cc;
 
         private Harmony harmony;
 
@@ -114,41 +109,21 @@ namespace SkinMod {
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 16 }));
 
-            x = Config.Bind<float>("", "Pos x", 0,
+            pos = Config.Bind<Vector3>("", "Position", Vector3.zero,
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 15 }));
 
-            y = Config.Bind<float>("", "Pos y", 0,
-                        new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 14 }));
+       
 
-            z = Config.Bind<float>("", "Pos z", 0,
-                        new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 13 }));
-
-            scaleX = Config.Bind<float>("", "scaleX", 10,
+            scale = Config.Bind<Vector3>("", "Scale", new Vector3(10f,10f,10f),
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 12 }));
 
-            scaleY = Config.Bind<float>("", "scaleY", 10,
-                        new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 11 }));
+        
 
-            scaleZ = Config.Bind<float>("", "scaleZ", 10,
-                        new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 10 }));
-
-            rotateX = Config.Bind<float>("", "RotateX", 0,
+            rotate = Config.Bind<Vector3>("", "Rotate", Vector3.zero,
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 9 }));
-
-            rotateY = Config.Bind<float>("", "RotateY", 0,
-                        new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 8 }));
-
-            rotateZ = Config.Bind<float>("", "RotateZ", 0,
-                        new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 7 }));
 
             orderLayer = Config.Bind<int>("", "orderLayer", 101,
                         new ConfigDescription("", null,
@@ -189,15 +164,9 @@ namespace SkinMod {
             goblin.SettingChanged += (s, e) => OnSkinChanged("Goblin", goblinObject, "Goblin");
             niko.SettingChanged += (s, e) => OnSkinChanged("Niko", nikoObject, "Niko");
             attackEffect.SettingChanged += (s, e) => AttackEffect(attackEffect.Value);
-            x.SettingChanged += (s, e) => UpdateCustom();
-            y.SettingChanged += (s, e) => UpdateCustom();
-            z.SettingChanged += (s, e) => UpdateCustom();
-            scaleX.SettingChanged += (s, e) => UpdateCustom();
-            scaleY.SettingChanged += (s, e) => UpdateCustom();
-            scaleZ.SettingChanged += (s, e) => UpdateCustom();
-            rotateX.SettingChanged += (s, e) => UpdateCustom();
-            rotateY.SettingChanged += (s, e) => UpdateCustom();
-            rotateZ.SettingChanged += (s, e) => UpdateCustom();
+            pos.SettingChanged += (s, e) => UpdateCustom();
+            scale.SettingChanged += (s, e) => UpdateCustom();
+            rotate.SettingChanged += (s, e) => UpdateCustom();
             orderLayer.SettingChanged += (s, e) => UpdateCustom();
             gifSpeed.SettingChanged += (s, e) => testgif.setSpeed(gifSpeed.Value);
             disableYi.SettingChanged += (s, e) => ActiveYi(!disableYi.Value);
@@ -251,9 +220,9 @@ namespace SkinMod {
         void UpdateCustom() {
             //ToastManager.Toast("test");
             
-            customObject.transform.localPosition = new Vector3(x.Value, y.Value, z.Value);
-            customObject.transform.localScale = new Vector3(scaleX.Value, scaleY.Value, scaleZ.Value);
-            customObject.transform.eulerAngles = new Vector3(rotateX.Value, rotateY.Value, rotateZ.Value);
+            customObject.transform.localPosition = pos.Value;
+            customObject.transform.localScale = scale.Value;
+            customObject.transform.eulerAngles = rotate.Value;
             customObject.GetComponent<SpriteRenderer>().sortingOrder = orderLayer.Value;
         }
 
@@ -284,16 +253,9 @@ namespace SkinMod {
                     GameObject.Find($"{SkinHolderPath}/customObject").GetComponent<SpriteRenderer>().sprite = testGif.LoadSprite(path.Value);
                 }
 
-                x.Value = customObject.transform.localPosition.x;
-                y.Value = customObject.transform.localPosition.y;
-                z.Value = customObject.transform.localPosition.z;
-                scaleX.Value = customObject.transform.localScale.x;
-                scaleY.Value = customObject.transform.localScale.y;
-                scaleZ.Value = customObject.transform.localScale.z;
-                rotateX.Value = customObject.transform.localEulerAngles.x;
-                rotateY.Value = customObject.transform.localEulerAngles.y;
-                rotateZ.Value = customObject.transform.localEulerAngles.z;
-
+                pos.Value = customObject.transform.localPosition;
+                scale.Value = customObject.transform.localScale;
+                rotate.Value = customObject.transform.localEulerAngles;
 
             } catch (Exception e) {
                 //ToastManager.Toast(e);
