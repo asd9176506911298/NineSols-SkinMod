@@ -1,6 +1,6 @@
 using BepInEx.Logging;
 
-namespace ExampleMod;
+namespace SkinMod;
 
 internal static class Log {
     private static ManualLogSource? logSource;
