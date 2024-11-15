@@ -47,12 +47,15 @@ namespace SkinMod {
 
         void test() {
             ToastManager.Toast("123");
-            if (GameCore.Instance != null) {
-                foreach (var x in GameCore.Instance.allScenes) {
-                    //ToastManager.Toast(x);
-                    SceneManager.LoadScene(x);
-                }
-            }
+            GameObjectScreenshot s = new GameObjectScreenshot();
+            s.targetObject = Player.i.gameObject;
+            s.CaptureGameObject();
+            //if (GameCore.Instance != null) {
+            //    foreach (var x in GameCore.Instance.allScenes) {
+            //        //ToastManager.Toast(x);
+            //        SceneManager.LoadScene(x);
+            //    }
+            //}
             //SceneManager.LoadScene("A1_S2_ConnectionToElevator_Final");
 
         }
@@ -70,6 +73,7 @@ namespace SkinMod {
         }
 
         void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
+            return;
             // Create a file path using the scene name
             string filePath = Path.Combine("E:\\Games\\note", $"{ scene.name}.txt");
 
