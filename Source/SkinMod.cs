@@ -187,7 +187,7 @@ namespace SkinMod {
             jee.SettingChanged += (s, e) => OnSkinChanged("Jee", jeeObject, "Jee");
             heng.SettingChanged += (s, e) => OnSkinChanged("Heng", hengObject, "Heng");
             goblin.SettingChanged += (s, e) => OnSkinChanged("Goblin", goblinObject, "Goblin");
-            niko.SettingChanged += (s, e) => OnSkinChanged("Niko", goblinObject, "Niko");
+            niko.SettingChanged += (s, e) => OnSkinChanged("Niko", nikoObject, "Niko");
             attackEffect.SettingChanged += (s, e) => AttackEffect(attackEffect.Value);
             x.SettingChanged += (s, e) => UpdateCustom();
             y.SettingChanged += (s, e) => UpdateCustom();
@@ -215,8 +215,6 @@ namespace SkinMod {
             hengObject = tree.LoadAsset<GameObject>("Heng");
             goblinObject = tree.LoadAsset<GameObject>("Goblin");
             nikoObject = tree.LoadAsset<GameObject>("Niko");
-
-            ToastManager.Toast(nikoObject);
 
             testgif = new testGif();
             testgif.testHook();
@@ -310,6 +308,7 @@ namespace SkinMod {
             jee.Value = false;
             heng.Value = false;
             goblin.Value = false;
+            niko.Value = false;
             attackEffect.Value = false;
 
             SceneManager.sceneLoaded += OnSceneLoaded;
@@ -404,7 +403,7 @@ namespace SkinMod {
         private void CreateSkin() {
             Vector3 skinPos = new Vector3(Player.i.transform.position.x, Player.i.transform.position.y + 35, Player.i.transform.position.z);
             GameObject skinClone = Instantiate(curSkinObject, skinPos, Quaternion.identity, GameObject.Find(SkinHolderPath).transform);
-
+            
             if (curSkin.Value == "DanceYi") {
                 skinClone.transform.localPosition = new Vector3(0f, 11.2001f, 0f);
                 skinClone.transform.localScale = new Vector3(0.55f, 0.55f, 0.55f);
@@ -427,8 +426,8 @@ namespace SkinMod {
                 skinClone.transform.localPosition = new Vector3(-1.499f, 12.7012f, 0f);
                 skinClone.transform.localScale = new Vector3(7f, 7f, 7f);
             } else if (curSkin.Value == "Niko") {
-                skinClone.transform.localPosition = new Vector3(-1.499f, 12.7012f, 0f);
-                skinClone.transform.localScale = new Vector3(7f, 7f, 7f);
+                skinClone.transform.localPosition = new Vector3(-1.499f, 15.7012f, 0f);
+                skinClone.transform.localScale = new Vector3(6f, 6f, 6f);
             }
 
             SetPlayerSpriteLayer("UI");

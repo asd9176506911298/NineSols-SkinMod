@@ -39,14 +39,13 @@ public class Patches {
         return true; // the original method should be executed
     }
 
-    [HarmonyPrefix, HarmonyPatch(typeof(Actor), "PlayAnimation", new Type[] {typeof(string),typeof(bool),typeof(float)})]
+    [HarmonyPrefix, HarmonyPatch(typeof(Actor), "PlayAnimation", new Type[] { typeof(string), typeof(bool), typeof(float) })]
     private static bool PatcUpdate(ref Actor __instance, string stateName) {
         if (__instance != Player.i)
             return true;
 
         //ToastManager.Toast("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/Attack(Clone)/Animator");
 
-        
 
         GameObject atkObject = GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/Attack(Clone)/Animator");
 
@@ -82,7 +81,7 @@ public class Patches {
 
         //ToastManager.Toast(curObject);
 
-        if (curObject == null)  
+        if (curObject == null)
             return true;
 
         Animator anim = curObject.GetComponent<Animator>();
@@ -99,11 +98,16 @@ public class Patches {
             anim.SetInteger("Status", 4);
         } else if (stateName.Contains("AirAttack")) {
             anim.SetInteger("Status", 5);
-        } else if (stateName.Contains("Shoot") && ( stateName.Contains("Prepare") || stateName.Contains("In Air"))) {
+        } else if (stateName.Contains("Shoot") && (stateName.Contains("Prepare") || stateName.Contains("In Air"))) {
             anim.SetInteger("Status", 6);
-        } else if (stateName.Contains("Rope")){
+        }else if (stateName.Contains("Hurt")) {
+            if (stateName.Contains("HurtHitToGround")) 
+                anim.SetInteger("Status", 8);
+            else
+                anim.SetInteger("Status", 7);
+        } else if (stateName.Contains("Rope")) {
             ToastManager.Toast("Rope");
-            if(stateName.Contains("Idle"))
+            if (stateName.Contains("Idle"))
                 anim.SetInteger("Status", 100);
             else if (stateName.Contains("Up") || stateName.Contains("Down"))
                 anim.SetInteger("Status", 101);
