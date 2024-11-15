@@ -26,6 +26,7 @@ namespace SkinMod {
         private ConfigEntry<bool> jee;
         private ConfigEntry<bool> heng;
         private ConfigEntry<bool> goblin;
+        private ConfigEntry<bool> niko;
         private ConfigEntry<bool> attackEffect;
         private ConfigEntry<string> path;
         private ConfigEntry<float> x;
@@ -56,6 +57,7 @@ namespace SkinMod {
         private GameObject jeeObject;
         private GameObject hengObject;
         private GameObject goblinObject;
+        private GameObject nikoObject;
         private GameObject customObject;
 
         private testGif testgif;
@@ -75,6 +77,10 @@ namespace SkinMod {
             curSkin = Config.Bind<string>("", "currSkin", "",
             new ConfigDescription("", null,
             new ConfigurationManagerAttributes { Order = 24 }));
+
+            niko = Config.Bind<bool>("", "Niko", true,
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 23 }));
 
             danceYi = Config.Bind<bool>("", "DanceYi", true,
                         new ConfigDescription("", null,
@@ -181,6 +187,7 @@ namespace SkinMod {
             jee.SettingChanged += (s, e) => OnSkinChanged("Jee", jeeObject, "Jee");
             heng.SettingChanged += (s, e) => OnSkinChanged("Heng", hengObject, "Heng");
             goblin.SettingChanged += (s, e) => OnSkinChanged("Goblin", goblinObject, "Goblin");
+            niko.SettingChanged += (s, e) => OnSkinChanged("Niko", goblinObject, "Niko");
             attackEffect.SettingChanged += (s, e) => AttackEffect(attackEffect.Value);
             x.SettingChanged += (s, e) => UpdateCustom();
             y.SettingChanged += (s, e) => UpdateCustom();
@@ -207,6 +214,9 @@ namespace SkinMod {
             jeeObject = tree.LoadAsset<GameObject>("Jee");
             hengObject = tree.LoadAsset<GameObject>("Heng");
             goblinObject = tree.LoadAsset<GameObject>("Goblin");
+            nikoObject = tree.LoadAsset<GameObject>("Niko");
+
+            ToastManager.Toast(nikoObject);
 
             testgif = new testGif();
             testgif.testHook();
@@ -415,7 +425,10 @@ namespace SkinMod {
                 skinClone.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
             } else if (curSkin.Value == "Goblin") {
                 skinClone.transform.localPosition = new Vector3(-1.499f, 12.7012f, 0f);
-                skinClone.transform.localScale = new Vector3(7f, 7f, 7f);   
+                skinClone.transform.localScale = new Vector3(7f, 7f, 7f);
+            } else if (curSkin.Value == "Niko") {
+                skinClone.transform.localPosition = new Vector3(-1.499f, 12.7012f, 0f);
+                skinClone.transform.localScale = new Vector3(7f, 7f, 7f);
             }
 
             SetPlayerSpriteLayer("UI");
