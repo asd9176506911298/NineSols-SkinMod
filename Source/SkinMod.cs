@@ -249,6 +249,7 @@ namespace SkinMod {
                     customObject.AddComponent<SpriteRenderer>();
                     
                     customObject.GetComponent<SpriteRenderer>().sprite = testGif.LoadSprite(path.Value);
+                    testgif.setSpeed(gifSpeed.Value);
                     //Destroy(GameObject.Find($"{SkinHolderPath}/test"));
                 } else {
                     customObject = GameObject.Find($"{SkinHolderPath}/customObject");
