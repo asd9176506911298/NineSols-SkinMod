@@ -22,6 +22,8 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using TMPro;
+using Cysharp.Threading.Tasks.Triggers;
 
 namespace SkinMod {
     [BepInDependency(NineSolsAPICore.PluginGUID)]
@@ -259,8 +261,40 @@ namespace SkinMod {
         void p1() {
             ToastManager.Toast("p1");
 
-            ScriptableObjectSaver s = new ScriptableObjectSaver();
-            s.SaveAllScriptableObjectsAsJson();
+            Vector3 v = new Vector3(50f, 50f, 50f);
+
+            // Disable all Animator components
+            foreach (var x in GameObject.FindObjectsOfType<Animator>()) {
+                x.enabled = false;
+            }
+
+            // Activate all parent GameObjects and scale each TextMeshPro found in the scene
+            foreach (var x in GameObject.FindObjectsOfType<TextMeshPro>()) {
+                ToastManager.Toast(x.gameObject);
+
+                // Set all parent GameObjects to active
+                var currentTransform = x.transform;
+                while (currentTransform != null) {
+                    currentTransform.gameObject.SetActive(true);
+                    currentTransform = currentTransform.parent;
+                }
+
+                x.transform.localScale = v;
+            }
+
+            // Activate all parent GameObjects and scale each TextMeshPro found in resources
+            foreach (var x in Resources.FindObjectsOfTypeAll<TextMeshPro>()) {
+                ToastManager.Toast(x);
+
+                // Set all parent GameObjects to active
+                var currentTransform = x.transform;
+                while (currentTransform != null) {
+                    currentTransform.gameObject.SetActive(true);
+                    currentTransform = currentTransform.parent;
+                }
+
+                x.transform.localScale = v;
+            }
 
 
 
