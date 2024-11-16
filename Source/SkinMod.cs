@@ -20,6 +20,7 @@ namespace SkinMod {
         private ConfigEntry<KeyboardShortcut> somethingKeyboardShortcut2 = null!;
         private ConfigEntry<KeyboardShortcut> somethingKeyboardShortcut3 = null!;
         private ConfigEntry<KeyboardShortcut> somethingKeyboardShortcut4 = null!;
+        private ConfigEntry<KeyboardShortcut> somethingKeyboardShortcut5 = null!;
         private ConfigEntry<int> layer = null!;
 
         private Harmony harmony;
@@ -44,17 +45,44 @@ namespace SkinMod {
             somethingKeyboardShortcut4 = Config.Bind("General.Somet1hing", "1",
           new KeyboardShortcut(KeyCode.W, KeyCode.LeftControl), "11 t0o3343 execute");
 
+            somethingKeyboardShortcut5 = Config.Bind("General.So1met1hing", "1",
+          new KeyboardShortcut(KeyCode.E, KeyCode.LeftControl), "11 t0o3313 execute");
+
             layer = Config.Bind("", "",1, "layer");
 
             KeybindManager.Add(this, test, () => somethingKeyboardShortcut.Value);
             KeybindManager.Add(this, reload, somethingKeyboardShortcut2.Value);
             KeybindManager.Add(this, Capture, () => somethingKeyboardShortcut3.Value);
             KeybindManager.Add(this, Skin, () => somethingKeyboardShortcut4.Value);
+            KeybindManager.Add(this, Show, () => somethingKeyboardShortcut5.Value);
 
 
 
 
             Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
+        }
+
+        void Show() {
+            foreach (var x in MonsterManager.Instance.monsterDict.Values) {
+                if (x != null) {
+                    if (x.gameObject != null)
+                        x.gameObject.SetActive(true);
+                    x.transform.SetParent(null);
+
+                    GetAllChildren(x.animator.transform);
+                    x.animator.enabled = !x.animator.enabled;
+                }
+
+            }
+            if(GameObject.Find("SceneCamera/AmplifyLightingSystem/FxCamera") != null)
+                GameObject.Find("SceneCamera/AmplifyLightingSystem/FxCamera").SetActive(false);
+
+            if (GameObject.Find("UE_Freecam") != null) {
+                GameObject.Find("UE_Freecam").GetComponent<Camera>().cullingMask = (1 << 16) + (1 << 17);
+                GameObject.Find("UE_Freecam").GetComponent<Camera>().farClipPlane = 20000f;
+                GameObject.Find("UE_Freecam").GetComponent<Camera>().transform.position = new Vector3(Player.i.Center.x, Player.i.Center.y, -400f); // Adjust position as needed
+                GameObject.Find("UE_Freecam").GetComponent<Camera>().transform.LookAt(Player.i.Center);         // Make the camera look at the player
+            }
         }
 
         void GetAllChildren(Transform parent) {
@@ -71,42 +99,46 @@ namespace SkinMod {
 
         void reload() {
             try { 
-            ToastManager.Toast(layer.Value);
-            ToastManager.Toast(LayerMask.LayerToName(layer.Value));
-            
-            //if(GameObject.Find("UE_Freecam") != null) {
-            //        GameObject.Find("UE_Freecam").GetComponent<Camera>().cullingMask = (1 << 16) + (1 << 17);
-            //        GameObject.Find("UE_Freecam").GetComponent<Camera>().farClipPlane = 20000f;
-            //        GameObject.Find("UE_Freecam").GetComponent<Camera>().transform.position = new Vector3(Player.i.Center.x, Player.i.Center.y, -300f); // Adjust position as needed
-            //        GameObject.Find("UE_Freecam").GetComponent<Camera>().transform.LookAt(Player.i.Center);         // Make the camera look at the player
-            //}
-            
+            //ToastManager.Toast(layer.Value);
+            //ToastManager.Toast(LayerMask.LayerToName(layer.Value));
 
+                if (GameObject.Find("UE_Freecam") != null) {
+                    GameObject.Find("UE_Freecam").GetComponent<Camera>().cullingMask = (1 << 16) + (1 << 17);
+                    GameObject.Find("UE_Freecam").GetComponent<Camera>().farClipPlane = 20000f;
+                    GameObject.Find("UE_Freecam").GetComponent<Camera>().transform.position = new Vector3(Player.i.Center.x, Player.i.Center.y, -300f); // Adjust position as needed
+                    GameObject.Find("UE_Freecam").GetComponent<Camera>().transform.LookAt(Player.i.Center);         // Make the camera look at the player
+                }
+
+
+
+                foreach (var x in MonsterManager.Instance.monsterDict.Values) {
+                    if (x != null) {
+                        if (x.gameObject != null)
+                            x.gameObject.SetActive(true);
+                        x.transform.SetParent(null);
+
+                        GetAllChildren(x.animator.transform);
+                    }
+                    x.animator.enabled = false;
+                    //x.Hide();
+                    //ToastManager.Toast(x.name);
+
+                }
 
             foreach (var x in MonsterManager.Instance.monsterDict.Values) {
-                //if(x != null) {
-                //    if(x.gameObject != null)
-                //        x.gameObject.SetActive(true);
-                //    x.transform.SetParent(null);
+                if(x!= null) {
 
-                //    //GetAllChildren(x.animator.transform);
-                //}
+                 
+                    ToastManager.Toast(x.name);
+                    //x.Show();
+                    //if(x.name == "StealthGameMonster_Spearman (1)")
+                    //    Capture(x);
 
-                //x.Hide();
-                //ToastManager.Toast(x.name);
-
-            }
-
-            foreach (var x in MonsterManager.Instance.monsterDict.Values) {
-                ToastManager.Toast(x.name);
-                //x.Show();
-                //if(x.name == "StealthGameMonster_Spearman (1)")
-                //    Capture(x);
-
-                Capture(x);
-                //ToastManager.Toast(GetGameObjectPath(x.animator.gameObject));
-                //x.Show();
-                //GetAllChildren(x.animator.transform);
+                    Capture(x);
+                    //ToastManager.Toast(GetGameObjectPath(x.animator.gameObject));
+                    //x.Show();
+                    //GetAllChildren(x.animator.transform);
+                }
             }
 
                 //GameObject parentObject = GameObject.Find("A1_S2_GameLevel/Room/Prefab/Gameplay5/[自然巡邏框架]/[MonsterBehaviorProvider] LevelDesign_CullingAndResetGroup/[MonsterBehaviorProvider] LevelDesign_Init_Scenario (看守的人)/StealthGameMonster_Spearman (1)/MonsterCore/Animator(Proxy)/Animator");
@@ -170,7 +202,7 @@ namespace SkinMod {
                 // Create a temporary camera
                 GameObject tempCameraObj = new GameObject("TempCamera");
                 Camera tempCamera = tempCameraObj.AddComponent<Camera>();
-                tempCamera.transform.position = new Vector3(m.Center.x, m.Center.y, -110f); // Adjust position as needed
+                tempCamera.transform.position = new Vector3(m.Center.x, m.Center.y, layer.Value); // Adjust position as needed
                 tempCamera.transform.LookAt(m.Center); // Make the camera look at the monster's center
 
                 // Set up the temporary camera for rendering
@@ -194,8 +226,8 @@ namespace SkinMod {
 
                 // Convert the texture to PNG and save it
                 string path = Path.Combine(
-                    "C:\\Users\\a0936\\AppData\\LocalLow\\RedCandleGames\\NineSols",
-                    $"{m.name}.png");
+                    "E:\\Games\\tmpEnemy",
+                    $"{m.name}-{DateTime.Now:ssfff}.png");
                 File.WriteAllBytes(path, screenshot.EncodeToPNG());
 
                 // Clean up
@@ -282,11 +314,11 @@ namespace SkinMod {
         Camera cameraToUse;
         RenderTexture rt;
         Texture2D screenshot;
-        int width = 1920;
-        int height = 1080;
+        //int width = 1920;
+        //int height = 1080;
 
-        //int width = 3840;
-        //int height = 2160;
+        int width = 3840;
+        int height = 2160;
 
         void CaptureScreenshot() {
             //foreach(var x in MonsterManager.Instance.monsterDict.Values){
@@ -363,7 +395,7 @@ namespace SkinMod {
                 screenshot.Apply();
 
                 // Convert the texture to PNG and save it
-                string path = Path.Combine("C:\\Users\\a0936\\AppData\\LocalLow\\RedCandleGames\\NineSols", $"{monster.gameObject.name}.png");
+                string path = Path.Combine("C:\\Users\\a0936\\AppData\\LocalLow\\RedCandleGames\\NineSols", $"{monster.gameObject.name}-{DateTime.Now:MMddHHmmss}.png");
                 File.WriteAllBytes(path, screenshot.EncodeToPNG());
 
                 // Clean up
