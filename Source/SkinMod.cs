@@ -64,6 +64,7 @@ namespace SkinMod {
 
         void Show() {
             foreach (var x in Resources.FindObjectsOfTypeAll<MonsterBase>()) {
+                ToastManager.Toast(x.name);
                 if (x != null) {
                     if (x.gameObject != null)
                         x.gameObject.SetActive(true);
@@ -91,8 +92,11 @@ namespace SkinMod {
 
         void GetAllChildren(Transform parent) {
             foreach (Transform child in parent) {
-                if (child.name.Contains("Mask") || child.name.Contains("shadow") || child.name.Contains("Fx") || child.name.Contains("Light") || child.name.Contains("light") || child.name.Contains("Glow") || child.name.Contains("LM_"))
+                if (child.name.Contains("Mask") || child.name.Contains("shadow") || child.name.Contains("Shadow") || child.name.Contains("Fx") || child.name.Contains("Light") || child.name.Contains("light") || child.name.Contains("Glow") || child.name.Contains("LM_"))
                     child.gameObject.SetActive(false);
+
+                if (child.name == "SpriteHolder")
+                    child.gameObject.SetActive(true);
                 // Print the child's name
                 //ToastManager.Toast(child);
                 child.gameObject.layer = 16;
@@ -317,6 +321,9 @@ namespace SkinMod {
         }
 
         void test() {
+            //GameObject.Find("P2_R22_Savepoint_GameLevel/EventBinder/General Boss Fight FSM Object Variant/FSM Animator/LogicRoot/ButterFly_BossFight_Logic/StealthGameMonster_Boss_ButterFly Variant").transform.SetParent(null);
+            RCGLifeCycle.DontDestroyForever(GameObject.Find("P2_R22_Savepoint_GameLevel/EventBinder/General Boss Fight FSM Object Variant/FSM Animator/LogicRoot/ButterFly_BossFight_Logic/StealthGameMonster_Boss_ButterFly Variant (RCGLifeCycle)"));
+            return;
             //ToastManager.Toast("123");
 
             CaptureScreenshot();
