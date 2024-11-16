@@ -63,18 +63,22 @@ namespace SkinMod {
         }
 
         void Show() {
-            foreach (var x in MonsterManager.Instance.monsterDict.Values) {
+            foreach (var x in Resources.FindObjectsOfTypeAll<MonsterBase>()) {
                 if (x != null) {
                     if (x.gameObject != null)
                         x.gameObject.SetActive(true);
+
+                    if (x.monsterCore != null)
+                        if (x.monsterCore.gameObject != null)
+                            x.monsterCore.gameObject.SetActive(true);
                     x.transform.SetParent(null);
 
                     GetAllChildren(x.animator.transform);
                     x.animator.enabled = !x.animator.enabled;
                 }
-
             }
-            if(GameObject.Find("SceneCamera/AmplifyLightingSystem/FxCamera") != null)
+
+            if (GameObject.Find("SceneCamera/AmplifyLightingSystem/FxCamera") != null)
                 GameObject.Find("SceneCamera/AmplifyLightingSystem/FxCamera").SetActive(false);
 
             if (GameObject.Find("UE_Freecam") != null) {
@@ -87,7 +91,7 @@ namespace SkinMod {
 
         void GetAllChildren(Transform parent) {
             foreach (Transform child in parent) {
-                if (child.name.Contains("Mask") || child.name.Contains("shadow"))
+                if (child.name.Contains("Mask") || child.name.Contains("shadow") || child.name.Contains("Fx") || child.name.Contains("Light") || child.name.Contains("light") || child.name.Contains("Glow") || child.name.Contains("LM_"))
                     child.gameObject.SetActive(false);
                 // Print the child's name
                 //ToastManager.Toast(child);
@@ -98,72 +102,90 @@ namespace SkinMod {
         }
 
         void reload() {
-            try { 
-            //ToastManager.Toast(layer.Value);
-            //ToastManager.Toast(LayerMask.LayerToName(layer.Value));
+            try {
+                // Log start of reload process
+                Log.Info("Starting reload process...");
 
-                if (GameObject.Find("UE_Freecam") != null) {
-                    GameObject.Find("UE_Freecam").GetComponent<Camera>().cullingMask = (1 << 16) + (1 << 17);
-                    GameObject.Find("UE_Freecam").GetComponent<Camera>().farClipPlane = 20000f;
-                    GameObject.Find("UE_Freecam").GetComponent<Camera>().transform.position = new Vector3(Player.i.Center.x, Player.i.Center.y, -300f); // Adjust position as needed
-                    GameObject.Find("UE_Freecam").GetComponent<Camera>().transform.LookAt(Player.i.Center);         // Make the camera look at the player
-                }
+                // Validate and configure UE_Freecam
+                GameObject freeCam = GameObject.Find("UE_Freecam");
+                if (freeCam == null) {
+                    Log.Error("UE_Freecam not found in the scene.");
+                } else {
+                    Camera freeCamCamera = freeCam.GetComponent<Camera>();
+                    if (freeCamCamera == null) {
+                        Log.Error("UE_Freecam does not have a Camera component.");
+                    } else {
+                        freeCamCamera.cullingMask = (1 << 16) + (1 << 17);
+                        freeCamCamera.farClipPlane = 20000f;
 
-
-
-                foreach (var x in MonsterManager.Instance.monsterDict.Values) {
-                    if (x != null) {
-                        if (x.gameObject != null)
-                            x.gameObject.SetActive(true);
-                        x.transform.SetParent(null);
-
-                        GetAllChildren(x.animator.transform);
+                        if (Player.i == null) {
+                            Log.Error("Player.i is null.");
+                        } else if (Player.i.Center == null) {
+                            Log.Error("Player.i.Center is null.");
+                        } else {
+                            freeCamCamera.transform.position = new Vector3(Player.i.Center.x, Player.i.Center.y, -300f);
+                            freeCamCamera.transform.LookAt(Player.i.Center);
+                        }
                     }
-                    x.animator.enabled = false;
-                    //x.Hide();
-                    //ToastManager.Toast(x.name);
-
                 }
 
-            foreach (var x in MonsterManager.Instance.monsterDict.Values) {
-                if(x!= null) {
+                // Validate MonsterManager
+                if (MonsterManager.Instance == null) {
+                    Log.Error("MonsterManager.Instance is null.");
+                    return;
+                }
 
-                 
-                    ToastManager.Toast(x.name);
-                    //x.Show();
-                    //if(x.name == "StealthGameMonster_Spearman (1)")
-                    //    Capture(x);
+                if (MonsterManager.Instance.monsterDict == null) {
+                    Log.Error("MonsterManager.Instance.monsterDict is null.");
+                    return;
+                }
 
+                // Activate monsters and configure them
+                foreach (var x in Resources.FindObjectsOfTypeAll<MonsterBase>()) {
+                    if (x == null) {
+                        Log.Error("A monster in monsterDict is null.");
+                        continue;
+                    }
+
+                    if (x.gameObject != null) {
+                        x.gameObject.SetActive(true);
+                        x.transform.SetParent(null);
+                    }
+                    if (x.monsterCore != null)
+                        if (x.monsterCore.gameObject != null)
+                            x.monsterCore.gameObject.SetActive(true);
+
+                    if (x.animator == null) {
+                        Log.Error($"Animator is null for monster: {x.name ?? "Unknown Monster"}");
+                    } else {
+                        GetAllChildren(x.animator.transform);
+                        x.animator.enabled = false;
+                    }
+                }
+
+                // Capture each monster
+                foreach (var x in Resources.FindObjectsOfTypeAll<MonsterBase>()) {
+                    if (x == null) {
+                        Log.Error("A monster in monsterDict is null.");
+                        continue;
+                    }
+
+                    if (string.IsNullOrEmpty(x.name)) {
+                        Log.Error("Monster name is null or empty.");
+                        continue;
+                    }
+
+                    Log.Info($"Capturing monster: {x.name}");
                     Capture(x);
-                    //ToastManager.Toast(GetGameObjectPath(x.animator.gameObject));
-                    //x.Show();
-                    //GetAllChildren(x.animator.transform);
                 }
-            }
 
-                //GameObject parentObject = GameObject.Find("A1_S2_GameLevel/Room/Prefab/Gameplay5/[自然巡邏框架]/[MonsterBehaviorProvider] LevelDesign_CullingAndResetGroup/[MonsterBehaviorProvider] LevelDesign_Init_Scenario (看守的人)/StealthGameMonster_Spearman (1)/MonsterCore/Animator(Proxy)/Animator");
-
-                //if (parentObject != null) {
-                //    GetAllChildren(parentObject.transform);
-                //}
-
-
-                //foreach (var camera in Camera.allCameras) {
-                //    if (camera.name == "SceneCamera") {
-                //        camera.cullingMask = (1 << 16) + (1 << 17);
-                //    }
-                //}
-
-
-
-                //Capture();
-                //Traverse.Create(GameCore.Instance).Method("ReloadScene").GetValue();
+                // Log completion of reload process
+                Log.Info("Reload process completed successfully.");
             } catch (NullReferenceException ex) {
                 Log.Error($"NullReferenceException in reload: {ex.Message}");
-                // Optionally, log more details (e.g., which component or object was null)
-                Log.Error($"Check if 'someComponent' is initialized properly.");
+                Log.Error("Check if all required components and objects are initialized properly.");
             } catch (Exception ex) {
-                Log.Error($"An unexpected error occurred: {ex.Message}");
+                Log.Error($"An unexpected error occurred in reload: {ex.Message}");
             }
         }
 
@@ -202,7 +224,7 @@ namespace SkinMod {
                 // Create a temporary camera
                 GameObject tempCameraObj = new GameObject("TempCamera");
                 Camera tempCamera = tempCameraObj.AddComponent<Camera>();
-                tempCamera.transform.position = new Vector3(m.Center.x, m.Center.y, layer.Value); // Adjust position as needed
+                tempCamera.transform.position = new Vector3(m.Center.x, m.Center.y, -layer.Value); // Adjust position as needed
                 tempCamera.transform.LookAt(m.Center); // Make the camera look at the monster's center
 
                 // Set up the temporary camera for rendering
