@@ -28,9 +28,6 @@ namespace SkinMod {
             new KeyboardShortcut(KeyCode.X, KeyCode.LeftControl), "Shortcut to execute");
 
             KeybindManager.Add(this, test, () => somethingKeyboardShortcut.Value);
-            
-
-
 
             Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
         }
@@ -46,14 +43,8 @@ namespace SkinMod {
         }
 
         void test() {
-            ToastManager.Toast("123");
-            if (GameCore.Instance != null) {
-                foreach (var x in GameCore.Instance.allScenes) {
-                    //ToastManager.Toast(x);
-                    SceneManager.LoadScene(x);
-                }
-            }
-            //SceneManager.LoadScene("A1_S2_ConnectionToElevator_Final");
+            ToastManager.Toast("test");
+
 
         }
 
@@ -70,22 +61,7 @@ namespace SkinMod {
         }
 
         void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
-            // Create a file path using the scene name
-            string filePath = Path.Combine("E:\\Games\\note", $"{ scene.name}.txt");
-
-            // Create or open the file for writing
-            using (StreamWriter writer = new StreamWriter(filePath, false)) {
-                // Write scene name to the file
-
-                // Loop through all Note objects in the scene and write their details to the file
-                foreach (var x in GameObject.FindObjectsOfType<Note>()) {
-                    writer.WriteLine($"Note:{x.note}");
-                    writer.WriteLine($"Path:{GetGameObjectPath(x.gameObject)}\n");
-                }
-            }
-
-            // Optionally log the file saved location
-            Log.Info($"Scene data saved to: {filePath}");
+            ToastManager.Toast(scene.name);
         }
 
 
