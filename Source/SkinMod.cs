@@ -1,8 +1,8 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
 using HarmonyLib;
+using InControl.NativeDeviceProfiles;
 using NineSolsAPI;
-using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,7 +13,9 @@ namespace SkinMod {
         public static SkinMod Instance { get; private set; }
 
         private ConfigEntry<KeyboardShortcut> somethingKeyboardShortcut = null!;
-
+        public ConfigEntry<bool> enableCool = null!;
+        public ConfigEntry<float> time = null!;
+        public bool xx = false;
         private Harmony harmony;
 
         private void Awake() {
@@ -23,6 +25,9 @@ namespace SkinMod {
             Instance = this;
 
             harmony = Harmony.CreateAndPatchAll(typeof(Patches).Assembly);
+
+            enableCool = Config.Bind("General.Something", "enable",false);
+            time = Config.Bind("General.Something", "time", 1.0f);
 
             somethingKeyboardShortcut = Config.Bind("General.Something", "Shortcut",
             new KeyboardShortcut(KeyCode.X, KeyCode.LeftControl), "Shortcut to execute");
@@ -36,7 +41,6 @@ namespace SkinMod {
             
         }
 
-
         void Start() {
 
             SceneManager.sceneLoaded += OnSceneLoaded;
@@ -44,7 +48,8 @@ namespace SkinMod {
 
         void test() {
             ToastManager.Toast("test");
-
+            xx = !xx;
+            Traverse.Create(SaveManager.Instance.allStatData.GetStat("RollCoolDown 閃避CD").Stat).Field("_value").SetValue(time.Value);
 
         }
 
