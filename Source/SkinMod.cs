@@ -21,6 +21,7 @@ namespace SkinMod {
         private ConfigEntry<KeyboardShortcut> customObjectShortcut = null!;
         public ConfigEntry<string> curSkin;
         private ConfigEntry<bool> danceYi;
+        private ConfigEntry<bool> chin;
         private ConfigEntry<bool> jieChuan;
         private ConfigEntry<bool> usagi;
         private ConfigEntry<bool> jee;
@@ -53,6 +54,7 @@ namespace SkinMod {
         private GameObject hengObject;
         private GameObject goblinObject;
         private GameObject nikoObject;
+        private GameObject chinObject;
         private GameObject customObject;
 
         private testGif testgif;
@@ -72,11 +74,16 @@ namespace SkinMod {
             // Skin settings (higher order numbers appear first)
             danceYi = Config.Bind<bool>("Skin", "DanceYi", true,
                         new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 25 }));
+
+            chin = Config.Bind<bool>("Skin", "Chin", true,
+                        new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 24 }));
 
             niko = Config.Bind<bool>("Skin", "Niko", true,
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 23 }));
+
 
             jieChuan = Config.Bind<bool>("Skin", "JieChuan", false,
                         new ConfigDescription("", null,
@@ -163,6 +170,7 @@ namespace SkinMod {
             heng.SettingChanged += (s, e) => OnSkinChanged("Heng", hengObject, "Heng");
             goblin.SettingChanged += (s, e) => OnSkinChanged("Goblin", goblinObject, "Goblin");
             niko.SettingChanged += (s, e) => OnSkinChanged("Niko", nikoObject, "Niko");
+            chin.SettingChanged += (s, e) => OnSkinChanged("ChinYi", chinObject, "Chin");
             attackEffect.SettingChanged += (s, e) => AttackEffect(attackEffect.Value);
             pos.SettingChanged += (s, e) => UpdateCustom();
             scale.SettingChanged += (s, e) => UpdateCustom();
@@ -184,6 +192,7 @@ namespace SkinMod {
             hengObject = tree.LoadAsset<GameObject>("Heng");
             goblinObject = tree.LoadAsset<GameObject>("Goblin");
             nikoObject = tree.LoadAsset<GameObject>("Niko");
+            chinObject = tree.LoadAsset<GameObject>("Chin");
 
             testgif = new testGif();
             testgif.testHook();
@@ -274,6 +283,7 @@ namespace SkinMod {
             heng.Value = false;
             goblin.Value = false;
             niko.Value = false;
+            chin.Value = false;
             attackEffect.Value = false;
 
             SceneManager.sceneLoaded += OnSceneLoaded;
@@ -392,6 +402,9 @@ namespace SkinMod {
                 skinClone.transform.localScale = new Vector3(7f, 7f, 7f);
             } else if (curSkin.Value == "Niko") {
                 skinClone.transform.localPosition = new Vector3(-1.499f, 15.7012f, 0f);
+                skinClone.transform.localScale = new Vector3(6f, 6f, 6f);
+            } else if (curSkin.Value == "ChinYi") {
+                skinClone.transform.localPosition = new Vector3(0f, 20.5f, 0f);
                 skinClone.transform.localScale = new Vector3(6f, 6f, 6f);
             }
 

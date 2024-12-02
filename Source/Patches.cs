@@ -88,7 +88,7 @@ public class Patches {
 
         if (stateName == "Idle") {
             anim.SetInteger("Status", 0);
-        } else if (stateName.Contains("Run")) {
+        } else if (stateName.Contains("Run") && !stateName.Contains("Wall")) {
             anim.SetInteger("Status", 1);
         } else if (stateName.Contains("Parry")) {
             anim.SetInteger("Status", 2);
@@ -106,11 +106,12 @@ public class Patches {
             else
                 anim.SetInteger("Status", 7);
         } else if (stateName.Contains("Rope")) {
-            ToastManager.Toast("Rope");
             if (stateName.Contains("Idle"))
                 anim.SetInteger("Status", 100);
             else if (stateName.Contains("Up") || stateName.Contains("Down"))
                 anim.SetInteger("Status", 101);
+        } else if (stateName.Contains("Wall")) {
+            anim.SetInteger("Status", 102);
         } else {
             anim.SetInteger("Status", 0);
         }

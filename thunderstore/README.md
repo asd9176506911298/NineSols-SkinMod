@@ -5,6 +5,7 @@
 
 # Skin
 - DanceYi
+- Chin Yi
 - Niko
 - JieChuan
 - Heng
