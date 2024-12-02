@@ -1,4 +1,6 @@
 ﻿using HarmonyLib;
+using NineSolsAPI;
+using System;
 
 namespace SkinMod;
 
@@ -18,5 +20,4 @@ public class Patches {
 
     //    return true; // the original method should be executed
     //}
-
 }
