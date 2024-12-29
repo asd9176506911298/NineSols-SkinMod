@@ -257,37 +257,7 @@ namespace SkinMod {
             //}
 
             //這個 和下面那個都要
-            var attacksPath = "A5_S5/Room/EventBinder/General Boss Fight FSM Object_結權/FSM Animator/LogicRoot/---Boss---/BossShowHealthArea/StealthGameMonster_Boss_JieChuan/States/Attacks";
-            var attacksParent = GameObject.Find(attacksPath);
-
-            if (attacksParent != null) {
-                for (int i = 0; i < attacksParent.transform.childCount; i++) {
-                    var attackChild = attacksParent.transform.GetChild(i);
-
-                    // Loop through each child under attackChild
-                    for (int z = 0; z < attackChild.transform.childCount; z++) {
-                        var weights = attackChild.transform.GetChild(z);
-                        var linkNextMoveStateWeight = weights.GetComponent<LinkNextMoveStateWeight>();
-
-                        // Check if the component exists to avoid null reference exceptions
-                        if (linkNextMoveStateWeight != null) {
-                            // Retrieve the immediate parent names for the path
-                            string childName = attackChild.name;
-                            string parentName = attackChild.parent != null ? attackChild.parent.name : "No Parent";
-
-                            foreach (var x in linkNextMoveStateWeight.stateWeightList) {
-                                ToastManager.Toast($"Parent Path: {parentName}/{childName}/{weights.name}, Name: {x.State}, Weight: {x.weight}");
-                            }
-                        }
-                    }
-                }
-            } else {
-                ToastManager.Toast("Attacks parent not found.");
-            }
-
-            //這個 也要
-            //[6] double attack
-            //var attacksPath = "A5_S5/Room/EventBinder/General Boss Fight FSM Object_結權/FSM Animator/LogicRoot/---Boss---/BossShowHealthArea/StealthGameMonster_Boss_JieChuan/States";
+            //var attacksPath = "A5_S1/Room/FlashKill Binding/werw/FSM Animator/LogicRoot/---Boss---/BossShowHealthArea/StealthGameMonster_Boss_JieChuan/States/Attacks";
             //var attacksParent = GameObject.Find(attacksPath);
 
             //if (attacksParent != null) {
@@ -301,15 +271,12 @@ namespace SkinMod {
 
             //            // Check if the component exists to avoid null reference exceptions
             //            if (linkNextMoveStateWeight != null) {
-            //                // Retrieve names of the immediate parent and its parent
-            //                string firstParentName = attackChild.name;
-            //                string secondParentName = attackChild.parent != null ? attackChild.parent.name : "No Parent";
-
-            //                // Loop through mustUseStates and prepare the "mustUseInStart" part
-            //                string mustUseInStart = string.Join(", ", linkNextMoveStateWeight.mustUseStates.Select(c => $"mustUseInStart:{{{c}}}"));
+            //                // Retrieve the immediate parent names for the path
+            //                string childName = attackChild.name;
+            //                string parentName = attackChild.parent != null ? attackChild.parent.name : "No Parent";
 
             //                foreach (var x in linkNextMoveStateWeight.stateWeightList) {
-            //                    ToastManager.Toast($"{firstParentName}/{secondParentName}/{weights.name}, Name: {x.State}, Weight: {x.weight}, {mustUseInStart}");
+            //                    ToastManager.Toast($"Parent Path: {parentName}/{childName}/{weights.name}, Name: {x.State}, Weight: {x.weight}");
             //                }
             //            }
             //        }
@@ -317,6 +284,39 @@ namespace SkinMod {
             //} else {
             //    ToastManager.Toast("Attacks parent not found.");
             //}
+
+            //這個 也要
+            //[6] double attack
+            var attacksPath = "A5_S1/Room/FlashKill Binding/werw/FSM Animator/LogicRoot/---Boss---/BossShowHealthArea/StealthGameMonster_Boss_JieChuan/States";
+            var attacksParent = GameObject.Find(attacksPath);
+
+            if (attacksParent != null) {
+                for (int i = 0; i < attacksParent.transform.childCount; i++) {
+                    var attackChild = attacksParent.transform.GetChild(i);
+
+                    // Loop through each child under attackChild
+                    for (int z = 0; z < attackChild.transform.childCount; z++) {
+                        var weights = attackChild.transform.GetChild(z);
+                        var linkNextMoveStateWeight = weights.GetComponent<LinkNextMoveStateWeight>();
+
+                        // Check if the component exists to avoid null reference exceptions
+                        if (linkNextMoveStateWeight != null) {
+                            // Retrieve names of the immediate parent and its parent
+                            string firstParentName = attackChild.name;
+                            string secondParentName = attackChild.parent != null ? attackChild.parent.name : "No Parent";
+
+                            // Loop through mustUseStates and prepare the "mustUseInStart" part
+                            string mustUseInStart = string.Join(", ", linkNextMoveStateWeight.mustUseStates.Select(c => $"mustUseInStart:{{{c}}}"));
+
+                            foreach (var x in linkNextMoveStateWeight.stateWeightList) {
+                                ToastManager.Toast($"{firstParentName}/{secondParentName}/{weights.name}, Name: {x.State}, Weight: {x.weight}, {mustUseInStart}");
+                            }
+                        }
+                    }
+                }
+            } else {
+                ToastManager.Toast("Attacks parent not found.");
+            }
 
 
 
