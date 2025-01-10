@@ -15,6 +15,15 @@ namespace SkinMod {
     public class SkinMod : BaseUnityPlugin {
         public static SkinMod Instance { get; private set; }
 
+        Camera cameraToUse;
+        RenderTexture rt;
+        Texture2D screenshot;
+        //int width = 1920;
+        //int height = 1080;
+
+        //int width = 426;
+        //int height = 240;
+
         private ConfigEntry<KeyboardShortcut> somethingKeyboardShortcut = null!;
         private ConfigEntry<KeyboardShortcut> CaptrueMapEnemyKey = null!;
         private ConfigEntry<KeyboardShortcut> CaptureCurrentPosition = null!;
@@ -22,6 +31,7 @@ namespace SkinMod {
         private ConfigEntry<KeyboardShortcut> ShowEnemyKey = null!;
         private ConfigEntry<float> cameraZDistance = null!;
         private ConfigEntry<Color> CameraBackGroundColor = null!;
+        private ConfigEntry<Vector2> PictuteSize = null!;
 
         private Harmony harmony;
 
@@ -51,6 +61,8 @@ namespace SkinMod {
             cameraZDistance = Config.Bind("", "cameraZDistance", 150.0f,"");
 
             CameraBackGroundColor = Config.Bind("", "CameraBackGroundColor", new Color(0f,0f,0f,0f),"");
+
+            PictuteSize = Config.Bind("", "PictuteSize", new Vector2(426f,240f), "");
 
             //KeybindManager.Add(this, test, () => somethingKeyboardShortcut.Value);
             KeybindManager.Add(this, CaptrueMapEnemy, CaptrueMapEnemyKey.Value);
@@ -234,8 +246,8 @@ namespace SkinMod {
                 tempCamera.transform.LookAt(m.Center); // Make the camera look at the monster's center
 
                 // Set up the temporary camera for rendering
-                rt = new RenderTexture(width, height, 24);
-                screenshot = new Texture2D(width, height, TextureFormat.RGBA32, false);
+                rt = new RenderTexture(Mathf.RoundToInt(PictuteSize.Value.x), Mathf.RoundToInt(PictuteSize.Value.y), 24);
+                screenshot = new Texture2D(Mathf.RoundToInt(PictuteSize.Value.x), Mathf.RoundToInt(PictuteSize.Value.y), TextureFormat.RGBA32, false);
                 tempCamera.targetTexture = rt;
                 tempCamera.clearFlags = CameraClearFlags.SolidColor;
                 //tempCamera.backgroundColor = new Color(0, 1, 0, 1); // Fully transparent
@@ -250,7 +262,7 @@ namespace SkinMod {
                 tempCamera.Render();
 
                 // Read the pixels from the RenderTexture to the Texture2D
-                screenshot.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+                screenshot.ReadPixels(new Rect(0, 0, Mathf.RoundToInt(PictuteSize.Value.x), Mathf.RoundToInt(PictuteSize.Value.y)), 0, 0);
                 screenshot.Apply();
 
                 string folderPath = Path.Combine(Paths.BepInExRootPath, "EnemyPic");
@@ -261,7 +273,7 @@ namespace SkinMod {
                 }
 
                 // Construct the full file path
-                string path = Path.Combine(folderPath, $"{m.name}-{DateTime.Now:ssfff}.png");
+                string path = Path.Combine(folderPath, $"{m.name}-{DateTime.Now:ssfff}-{Mathf.RoundToInt(PictuteSize.Value.x)}x{Mathf.RoundToInt(PictuteSize.Value.y)}.png");
 
                 // Save the file
                 File.WriteAllBytes(path, screenshot.EncodeToPNG());
@@ -287,8 +299,8 @@ namespace SkinMod {
             tempCamera.transform.LookAt(Player.i.Center);         // Make the camera look at the player
 
             // Set up the temporary camera for rendering
-            rt = new RenderTexture(width, height, 24);
-            screenshot = new Texture2D(width, height, TextureFormat.RGBA32, false);
+            rt = new RenderTexture(Mathf.RoundToInt(PictuteSize.Value.x), Mathf.RoundToInt(PictuteSize.Value.y), 24);
+            screenshot = new Texture2D(Mathf.RoundToInt(PictuteSize.Value.x), Mathf.RoundToInt(PictuteSize.Value.y), TextureFormat.RGBA32, false);
             tempCamera.targetTexture = rt;
             tempCamera.clearFlags = CameraClearFlags.SolidColor;
             tempCamera.backgroundColor = CameraBackGroundColor.Value;
@@ -299,13 +311,13 @@ namespace SkinMod {
             // Set the culling mask for the camera
             //tempCamera.cullingMask = 168279809;
             tempCamera.cullingMask = (1 << 16);
-            ToastManager.Toast(tempCamera.cullingMask);
+            //ToastManager.Toast(tempCamera.cullingMask);
             // Render the object to the RenderTexture
             RenderTexture.active = rt;
             tempCamera.Render();
 
             // Read the pixels from the RenderTexture to the Texture2D
-            screenshot.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+            screenshot.ReadPixels(new Rect(0, 0, Mathf.RoundToInt(PictuteSize.Value.x), Mathf.RoundToInt(PictuteSize.Value.y)), 0, 0);
             screenshot.Apply();
 
             string folderPath = Path.Combine(Paths.BepInExRootPath, "EnemyPic");
@@ -316,7 +328,7 @@ namespace SkinMod {
             }
 
             // Construct the full file path
-            string path = Path.Combine(folderPath, $"{DateTime.Now:ssfff}.png");
+            string path = Path.Combine(folderPath, $"Capture-{DateTime.Now:ssfff}-{Mathf.RoundToInt(PictuteSize.Value.x)}x{Mathf.RoundToInt(PictuteSize.Value.y)}.png");
             File.WriteAllBytes(path, screenshot.EncodeToPNG());
 
             // Clean up
@@ -356,14 +368,7 @@ namespace SkinMod {
 
         }
 
-        Camera cameraToUse;
-        RenderTexture rt;
-        Texture2D screenshot;
-        //int width = 1920;
-        //int height = 1080;
-
-        int width = 426;
-        int height = 240;
+     
 
         void CaptureScreenshot() {
             //foreach(var x in MonsterManager.Instance.monsterDict.Values){
@@ -404,8 +409,8 @@ namespace SkinMod {
             var monsters = MonsterManager.Instance.monsterDict.Values;
 
             // Set up common parameters for screenshot (done only once)
-            rt = new RenderTexture(width, height, 24);
-            screenshot = new Texture2D(width, height, TextureFormat.RGBA32, false);
+            rt = new RenderTexture(Mathf.RoundToInt(PictuteSize.Value.x), Mathf.RoundToInt(PictuteSize.Value.y), 24);
+            screenshot = new Texture2D(Mathf.RoundToInt(PictuteSize.Value.x), Mathf.RoundToInt(PictuteSize.Value.y), TextureFormat.RGBA32, false);
             cameraToUse.targetTexture = rt;
             cameraToUse.clearFlags = CameraClearFlags.SolidColor;
             cameraToUse.backgroundColor = new Color(0, 0, 0, 0); // Fully transparent
@@ -436,7 +441,7 @@ namespace SkinMod {
                 yield return null;
 
                 // Read the pixels from the RenderTexture to the Texture2D
-                screenshot.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+                screenshot.ReadPixels(new Rect(0, 0, Mathf.RoundToInt(PictuteSize.Value.x), Mathf.RoundToInt(PictuteSize.Value.y)), 0, 0);
                 screenshot.Apply();
 
                 // Convert the texture to PNG and save it
