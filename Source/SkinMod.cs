@@ -1,5 +1,4 @@
-﻿using Battlehub.RTHandles;
-using BepInEx;
+﻿using BepInEx;
 using BepInEx.Configuration;
 using Com.LuisPedroFonseca.ProCamera2D;
 using HarmonyLib;
@@ -17,11 +16,12 @@ namespace SkinMod {
         public static SkinMod Instance { get; private set; }
 
         private ConfigEntry<KeyboardShortcut> somethingKeyboardShortcut = null!;
-        private ConfigEntry<KeyboardShortcut> somethingKeyboardShortcut2 = null!;
-        private ConfigEntry<KeyboardShortcut> somethingKeyboardShortcut3 = null!;
-        private ConfigEntry<KeyboardShortcut> somethingKeyboardShortcut4 = null!;
-        private ConfigEntry<KeyboardShortcut> somethingKeyboardShortcut5 = null!;
-        private ConfigEntry<int> layer = null!;
+        private ConfigEntry<KeyboardShortcut> CaptrueMapEnemyKey = null!;
+        private ConfigEntry<KeyboardShortcut> CaptureCurrentPosition = null!;
+        private ConfigEntry<KeyboardShortcut> DisableMapSkinKey = null!;
+        private ConfigEntry<KeyboardShortcut> ShowEnemyKey = null!;
+        private ConfigEntry<float> cameraZDistance = null!;
+        private ConfigEntry<Color> CameraBackGroundColor = null!;
 
         private Harmony harmony;
 
@@ -32,29 +32,31 @@ namespace SkinMod {
             Instance = this;
 
             harmony = Harmony.CreateAndPatchAll(typeof(Patches).Assembly);
-
+            
             somethingKeyboardShortcut = Config.Bind("General.Some1thing", "Shortcut",
             new KeyboardShortcut(KeyCode.X, KeyCode.LeftControl), "Shortcut to execute");
 
-            somethingKeyboardShortcut2 = Config.Bind("General.So1mething", "1",
-           new KeyboardShortcut(KeyCode.R, KeyCode.LeftControl), "1 to execute");
+            CaptrueMapEnemyKey = Config.Bind("General.So1mething", "CaptrueMapEnemyKey",
+           new KeyboardShortcut(KeyCode.R, KeyCode.LeftControl), "CaptrueMapEnemyKey");
 
-            somethingKeyboardShortcut3 = Config.Bind("General.Someth1ing", "1",
-          new KeyboardShortcut(KeyCode.D, KeyCode.LeftControl), "1 t0o execute");
+            CaptureCurrentPosition = Config.Bind("General.Someth1ing", "CaptureCurrentPosition",
+          new KeyboardShortcut(KeyCode.D, KeyCode.LeftControl), "CaptureCurrentPosition");
 
-            somethingKeyboardShortcut4 = Config.Bind("General.Somet1hing", "1",
-          new KeyboardShortcut(KeyCode.W, KeyCode.LeftControl), "11 t0o3343 execute");
+            DisableMapSkinKey = Config.Bind("General.Somet1hing", "1",
+          new KeyboardShortcut(KeyCode.W, KeyCode.LeftControl), "DisableMapSkinKey");
 
-            somethingKeyboardShortcut5 = Config.Bind("General.So1met1hing", "1",
-          new KeyboardShortcut(KeyCode.E, KeyCode.LeftControl), "11 t0o3313 execute");
+            ShowEnemyKey = Config.Bind("General.So1met1hing", "1",
+          new KeyboardShortcut(KeyCode.E, KeyCode.LeftControl), "ShowEnemyKey");
 
-            layer = Config.Bind("", "",1, "layer");
+            cameraZDistance = Config.Bind("", "cameraZDistance", 150.0f,"");
 
-            KeybindManager.Add(this, test, () => somethingKeyboardShortcut.Value);
-            KeybindManager.Add(this, reload, somethingKeyboardShortcut2.Value);
-            KeybindManager.Add(this, Capture, () => somethingKeyboardShortcut3.Value);
-            KeybindManager.Add(this, Skin, () => somethingKeyboardShortcut4.Value);
-            KeybindManager.Add(this, Show, () => somethingKeyboardShortcut5.Value);
+            CameraBackGroundColor = Config.Bind("", "CameraBackGroundColor", new Color(0f,0f,0f,0f),"");
+
+            //KeybindManager.Add(this, test, () => somethingKeyboardShortcut.Value);
+            KeybindManager.Add(this, CaptrueMapEnemy, CaptrueMapEnemyKey.Value);
+            KeybindManager.Add(this, Capture, () => CaptureCurrentPosition.Value);
+            KeybindManager.Add(this, Skin, () => DisableMapSkinKey.Value);
+            KeybindManager.Add(this, Show, () => ShowEnemyKey.Value);
 
 
 
@@ -105,7 +107,7 @@ namespace SkinMod {
             }
         }
 
-        void reload() {
+        void CaptrueMapEnemy() {
             try {
                 // Log start of reload process
                 Log.Info("Starting reload process...");
@@ -228,7 +230,7 @@ namespace SkinMod {
                 // Create a temporary camera
                 GameObject tempCameraObj = new GameObject("TempCamera");
                 Camera tempCamera = tempCameraObj.AddComponent<Camera>();
-                tempCamera.transform.position = new Vector3(m.Center.x, m.Center.y, -layer.Value); // Adjust position as needed
+                tempCamera.transform.position = new Vector3(m.Center.x, m.Center.y, -cameraZDistance.Value); // Adjust position as needed
                 tempCamera.transform.LookAt(m.Center); // Make the camera look at the monster's center
 
                 // Set up the temporary camera for rendering
@@ -236,10 +238,11 @@ namespace SkinMod {
                 screenshot = new Texture2D(width, height, TextureFormat.RGBA32, false);
                 tempCamera.targetTexture = rt;
                 tempCamera.clearFlags = CameraClearFlags.SolidColor;
-                tempCamera.backgroundColor = new Color(0, 0, 0, 0); // Fully transparent
+                //tempCamera.backgroundColor = new Color(0, 1, 0, 1); // Fully transparent
+                tempCamera.backgroundColor = CameraBackGroundColor.Value;
 
                 // Set the culling mask for the camera
-                tempCamera.cullingMask = 168279809;
+                //tempCamera.cullingMask = 168279809;
                 tempCamera.cullingMask = (1 << 16);
 
                 // Render the object to the RenderTexture
@@ -250,11 +253,19 @@ namespace SkinMod {
                 screenshot.ReadPixels(new Rect(0, 0, width, height), 0, 0);
                 screenshot.Apply();
 
-                // Convert the texture to PNG and save it
-                string path = Path.Combine(
-                    "E:\\Games\\tmpEnemy",
-                    $"{m.name}-{DateTime.Now:ssfff}.png");
+                string folderPath = Path.Combine(Paths.BepInExRootPath, "EnemyPic");
+
+                // Ensure the directory exists
+                if (!Directory.Exists(folderPath)) {
+                    Directory.CreateDirectory(folderPath);
+                }
+
+                // Construct the full file path
+                string path = Path.Combine(folderPath, $"{m.name}-{DateTime.Now:ssfff}.png");
+
+                // Save the file
                 File.WriteAllBytes(path, screenshot.EncodeToPNG());
+
 
                 // Clean up
                 tempCamera.targetTexture = null;
@@ -272,7 +283,7 @@ namespace SkinMod {
             // Create a temporary camera
             GameObject tempCameraObj = new GameObject("TempCamera");
             Camera tempCamera = tempCameraObj.AddComponent<Camera>();
-            tempCamera.transform.position = new Vector3(Player.i.Center.x, Player.i.Center.y, -60f); // Adjust position as needed
+            tempCamera.transform.position = new Vector3(Player.i.Center.x, Player.i.Center.y, cameraZDistance.Value); // Adjust position as needed
             tempCamera.transform.LookAt(Player.i.Center);         // Make the camera look at the player
 
             // Set up the temporary camera for rendering
@@ -280,15 +291,15 @@ namespace SkinMod {
             screenshot = new Texture2D(width, height, TextureFormat.RGBA32, false);
             tempCamera.targetTexture = rt;
             tempCamera.clearFlags = CameraClearFlags.SolidColor;
-            tempCamera.backgroundColor = new Color(0, 0, 0, 0); // Fully transparent
+            tempCamera.backgroundColor = CameraBackGroundColor.Value;
 
             // Disable skin objects and alert meter
             //DisableSkinObjects();
 
             // Set the culling mask for the camera
-            tempCamera.cullingMask = 168279809;
+            //tempCamera.cullingMask = 168279809;
             tempCamera.cullingMask = (1 << 16);
-            
+            ToastManager.Toast(tempCamera.cullingMask);
             // Render the object to the RenderTexture
             RenderTexture.active = rt;
             tempCamera.Render();
@@ -297,10 +308,15 @@ namespace SkinMod {
             screenshot.ReadPixels(new Rect(0, 0, width, height), 0, 0);
             screenshot.Apply();
 
-            // Convert the texture to PNG and save it
-            string path = Path.Combine(
-                "C:\\Users\\a0936\\AppData\\LocalLow\\RedCandleGames\\NineSols",
-                $"{DateTime.Now:yyyy-MM-dd-HH-mm-ss}.png");
+            string folderPath = Path.Combine(Paths.BepInExRootPath, "EnemyPic");
+
+            // Ensure the directory exists
+            if (!Directory.Exists(folderPath)) {
+                Directory.CreateDirectory(folderPath);
+            }
+
+            // Construct the full file path
+            string path = Path.Combine(folderPath, $"{DateTime.Now:ssfff}.png");
             File.WriteAllBytes(path, screenshot.EncodeToPNG());
 
             // Clean up
@@ -346,8 +362,8 @@ namespace SkinMod {
         //int width = 1920;
         //int height = 1080;
 
-        int width = 3840;
-        int height = 2160;
+        int width = 426;
+        int height = 240;
 
         void CaptureScreenshot() {
             //foreach(var x in MonsterManager.Instance.monsterDict.Values){
