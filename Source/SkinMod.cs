@@ -247,6 +247,19 @@ namespace SkinMod {
         }
 
         void p1() {
+
+
+            var circlePath = GameObject.Find("A10S5/Room/Boss And Environment Binder/General Boss Fight FSM Object 姬 Variant/FSM Animator/LogicRoot/---Boss---/BossShowHealthArea/StealthGameMonster_Boss_Jee/MonsterCore/Animator(Proxy)/Animator/LogicRoot/[Logic]Jee_Divination_Logic/RotateForAnimation/CirclePath");
+            var copyObject = GameObject.Find("A10S5/Room/Boss And Environment Binder/General Boss Fight FSM Object 姬 Variant/FSM Animator/LogicRoot/---Boss---/BossShowHealthArea/StealthGameMonster_Boss_Jee/MonsterCore/Animator(Proxy)/Animator/LogicRoot/[Logic]Jee_Divination_Logic/RotateForAnimation/CirclePath/TreePower Lamp Variant_Divination");
+
+            for(int i = 0; i < 12; i++) {
+                var o = Instantiate(copyObject);
+                o.transform.position = Vector3.zeroVector;
+                o.transform.SetParent(circlePath.transform);
+                circlePath.GetComponent<CirclePath>().nearbyTransforms.Add(o.transform);
+            }
+            //modify Cirlce Degress 3+12= 15 360/15 = 24
+
             //var tri = GameObject.Find("GameLevel/Room/Prefab/EventBinder/General Boss Fight FSM Object Variant/FSM Animator/LogicRoot/---Boss---/Boss_Yi Gung/States/Attacks/[13] Tripple Poke 三連");
 
             //foreach (var x in tri.transform.Find("weight").GetComponent<LinkNextMoveStateWeight>().stateWeightList) {
@@ -320,38 +333,38 @@ namespace SkinMod {
             //}
 
             //test Jee
-            var attacksPath = "A10S5/Room/Boss And Environment Binder/General Boss Fight FSM Object 姬 Variant/FSM Animator/LogicRoot/---Boss---/BossShowHealthArea/StealthGameMonster_Boss_Jee/MonsterCore/AttackSequenceModule/MonsterStateSequence_Phase1";
-            var attacksParent = GameObject.Find(attacksPath);
-            
-            if (attacksParent != null) {
-                for (int i = 0; i < attacksParent.transform.childCount; i++) {
-                    var attackChild = attacksParent.transform.GetChild(i);
+            //var attacksPath = "A10S5/Room/Boss And Environment Binder/General Boss Fight FSM Object 姬 Variant/FSM Animator/LogicRoot/---Boss---/BossShowHealthArea/StealthGameMonster_Boss_Jee/MonsterCore/AttackSequenceModule/MonsterStateSequence_Phase1";
+            //var attacksParent = GameObject.Find(attacksPath);
 
-                    var monsterStateGroupSequence = attackChild.GetComponent<MonsterStateGroupSequence>();
-                    foreach(var AttackSequence in monsterStateGroupSequence.AttackSequence) {
-                        foreach(var weight in AttackSequence.setting.stateWeightList) {
-                            ToastManager.Toast($"Group: {monsterStateGroupSequence.name}, AttackSequence: {AttackSequence.name}, Name: {weight.option.name}, weight: {weight.weight}");
-                        }
-                    }
-                        
-                    // Check if the component exists to avoid null reference exceptions
-                    if (monsterStateGroupSequence != null) {
-                        // Retrieve names of the immediate parent and its parent
-                        string firstParentName = attackChild.name;
-                        string secondParentName = attackChild.parent != null ? attackChild.parent.name : "No Parent";
-                            
-                        // Loop through mustUseStates and prepare the "mustUseInStart" part
-                        //string mustUseInStart = string.Join(", ", linkNextMoveStateWeight.mustUseStates.Select(c => $"mustUseInStart:{{{c}}}"));
+            //if (attacksParent != null) {
+            //    for (int i = 0; i < attacksParent.transform.childCount; i++) {
+            //        var attackChild = attacksParent.transform.GetChild(i);
 
-                        //foreach (var x in linkNextMoveStateWeight.stateWeightList) {
-                        //    ToastManager.Toast($"{firstParentName}/{secondParentName}/{weights.name}, Name: {x.State}, Weight: {x.weight}, {mustUseInStart}");
-                        //}
-                    }
+            //        var monsterStateGroupSequence = attackChild.GetComponent<MonsterStateGroupSequence>();
+            //        foreach(var AttackSequence in monsterStateGroupSequence.AttackSequence) {
+            //            foreach(var weight in AttackSequence.setting.stateWeightList) {
+            //                ToastManager.Toast($"Group: {monsterStateGroupSequence.name}, AttackSequence: {AttackSequence.name}, Name: {weight.option.name}, weight: {weight.weight}");
+            //            }
+            //        }
 
-                }
-            } else {
-                ToastManager.Toast("Attacks parent not found.");
-            }
+            //        // Check if the component exists to avoid null reference exceptions
+            //        if (monsterStateGroupSequence != null) {
+            //            // Retrieve names of the immediate parent and its parent
+            //            string firstParentName = attackChild.name;
+            //            string secondParentName = attackChild.parent != null ? attackChild.parent.name : "No Parent";
+
+            //            // Loop through mustUseStates and prepare the "mustUseInStart" part
+            //            //string mustUseInStart = string.Join(", ", linkNextMoveStateWeight.mustUseStates.Select(c => $"mustUseInStart:{{{c}}}"));
+
+            //            //foreach (var x in linkNextMoveStateWeight.stateWeightList) {
+            //            //    ToastManager.Toast($"{firstParentName}/{secondParentName}/{weights.name}, Name: {x.State}, Weight: {x.weight}, {mustUseInStart}");
+            //            //}
+            //        }
+
+            //    }
+            //} else {
+            //    ToastManager.Toast("Attacks parent not found.");
+            //}
 
 
             //var attacksPath = "GameLevel/Room/Prefab/EventBinder/General Boss Fight FSM Object Variant/FSM Animator/LogicRoot/---Boss---/Boss_Yi Gung/States";
