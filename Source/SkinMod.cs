@@ -37,6 +37,7 @@ namespace SkinMod {
         private ConfigEntry<float> gifSpeed;
         private ConfigEntry<bool> disableYi;
         private ConfigEntry<bool> hideCustomObject;
+        private ConfigEntry<bool> noFlip;
         private ConfigEntry<Vector3> cc;
 
         private Harmony harmony;
@@ -63,6 +64,7 @@ namespace SkinMod {
         public HandlerNoParam onUpdate;
 
         private const string SkinHolderPath = "GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder";
+        private string customObjectPath = "";
 
         private void Awake() {
             RCGLifeCycle.DontDestroyForever(gameObject);
@@ -142,20 +144,24 @@ namespace SkinMod {
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 9 }));
 
+            noFlip = Config.Bind<bool>("Custom Pic Gif", "Pic,Gif No Flip need ReCreate pic,gif", false,
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 8 }));
+
             // General settings
             enableSkinKeyboardShortcut = Config.Bind("", "Enable Skin Shortcut",
                         new KeyboardShortcut(KeyCode.Q, KeyCode.LeftShift),
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 8 }));
+                        new ConfigurationManagerAttributes { Order = 7 }));
 
             customObjectShortcut = Config.Bind("", "Create Custom Picture Gif Shortcut",
                         new KeyboardShortcut(KeyCode.Q, KeyCode.LeftControl),
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 7 }));
+                        new ConfigurationManagerAttributes { Order = 6 }));
 
             curSkin = Config.Bind<string>("", "currSkin", "",
                         new ConfigDescription("", null,
-                        new ConfigurationManagerAttributes { Order = 6 }));
+                        new ConfigurationManagerAttributes { Order = 5 }));
 
 
             KeybindManager.Add(this, ToggleSkin, () => enableSkinKeyboardShortcut.Value);
@@ -245,24 +251,35 @@ namespace SkinMod {
 
             hideCustomObject.Value = false;
 
+            if (noFlip.Value)
+                customObjectPath = "GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy";
+            else
+                customObjectPath = "GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder";
+
             if (path.Value == "")
                 return;
 
+            if (GameObject.Find($"GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/customObject"))
+                Destroy(GameObject.Find($"GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/customObject"));
+
+            if (GameObject.Find($"GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/customObject"))
+                Destroy(GameObject.Find($"GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/customObject"));
+
             try {
-                if (!GameObject.Find($"{SkinHolderPath}/customObject")) {
+                if (!GameObject.Find($"{customObjectPath}/customObject")) {
                     customObject = new GameObject("customObject");
                     customObject.transform.position = Player.i.transform.position;
                     customObject.transform.localScale = new Vector3(10f, 10f, 10f);
                     customObject.transform.localPosition = new Vector3(Player.i.transform.position.x, Player.i.transform.position.y, Player.i.transform.position.z);
-                    customObject.transform.SetParent(GameObject.Find($"{SkinHolderPath}").transform);
+                    customObject.transform.SetParent(GameObject.Find($"{customObjectPath}").transform);
                     customObject.AddComponent<SpriteRenderer>();
                     
                     customObject.GetComponent<SpriteRenderer>().sprite = testGif.LoadSprite(path.Value);
                     testgif.setSpeed(gifSpeed.Value);
                     //Destroy(GameObject.Find($"{SkinHolderPath}/test"));
                 } else {
-                    customObject = GameObject.Find($"{SkinHolderPath}/customObject");
-                    GameObject.Find($"{SkinHolderPath}/customObject").GetComponent<SpriteRenderer>().sprite = testGif.LoadSprite(path.Value);
+                    customObject = GameObject.Find($"{customObjectPath}/customObject");
+                    GameObject.Find($"{customObjectPath}/customObject").GetComponent<SpriteRenderer>().sprite = testGif.LoadSprite(path.Value);
                 }
 
                 pos.Value = customObject.transform.localPosition;
