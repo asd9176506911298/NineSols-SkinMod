@@ -15,6 +15,7 @@
 - AttackEffect
 - Custom picture or GIF
 - Custom position sacle rotate order gifSpeed
+- Custom Pic Gif no Flip
 
 # Flip Image
 - scale 1 to -1 will flip
