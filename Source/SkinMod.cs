@@ -1,21 +1,27 @@
-﻿using BepInEx;
+﻿using Battlehub.MeshDeformer2;
+using BepInEx;
 using BepInEx.Configuration;
 
 using BepInEx.Logging;
 using HarmonyLib;
 using MonoMod.RuntimeDetour;
+using Newtonsoft.Json;
 using NineSolsAPI;
 using NineSolsAPI.Utils;
 using RCGFSM.PlayerAbility;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static SkinMod.testGif;
+using static System.Net.Mime.MediaTypeNames;
 namespace SkinMod {
     [BepInDependency(NineSolsAPICore.PluginGUID)]
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
     public class SkinMod : BaseUnityPlugin {
         public static SkinMod Instance { get; private set; }
+        readonly static Dictionary<string, Sprite> cacheSprite = new Dictionary<string, Sprite>();
 
         private ConfigEntry<KeyboardShortcut> enableSkinKeyboardShortcut;
         private ConfigEntry<KeyboardShortcut> customObjectShortcut = null!;
@@ -38,6 +44,7 @@ namespace SkinMod {
         private ConfigEntry<bool> disableYi;
         private ConfigEntry<bool> hideCustomObject;
         private ConfigEntry<bool> noFlip;
+        private ConfigEntry<bool> testSprite;
         private ConfigEntry<Vector3> cc;
 
         private Harmony harmony;
@@ -163,6 +170,10 @@ namespace SkinMod {
                         new ConfigDescription("", null,
                         new ConfigurationManagerAttributes { Order = 5 }));
 
+            testSprite = Config.Bind<bool>("", "testSprite", false,
+                        new ConfigDescription("", null,
+                        new ConfigurationManagerAttributes { Order = 4 }));
+
 
             KeybindManager.Add(this, ToggleSkin, () => enableSkinKeyboardShortcut.Value);
             KeybindManager.Add(this, CustomObject, () => customObjectShortcut.Value);
@@ -232,6 +243,30 @@ namespace SkinMod {
 
         void Update() {
             onUpdate?.Invoke();
+        }
+
+        void LateUpdate() {
+            if (!testSprite.Value) return;
+
+            if (Player.i != null && Player.i.PlayerSprite != null) {
+                string spriteName = Player.i.PlayerSprite.sprite.name;
+                if (cacheSprite.ContainsKey(spriteName)) {
+                    Player.i.PlayerSprite.sprite = cacheSprite[spriteName];
+                } else {
+                    string path = $"E:\\Games\\Nine Sols1030\\NineSols_Data\\extract\\testSkin2\\Sprite\\{spriteName}.png";
+                    if (File.Exists(path)) {
+                        byte[] data = File.ReadAllBytes(path);
+                        Texture2D tex2D = new Texture2D(2, 2);
+                        if (tex2D.LoadImage(data)) {
+                            Sprite sprite = Sprite.Create(tex2D, new Rect(0, 0, tex2D.width, tex2D.height), new Vector2(0.5f, 0f), 8.0f);
+                            Player.i.PlayerSprite.sprite = sprite;
+                            cacheSprite[spriteName] = sprite; // 使用索引器避免異常
+                        }
+                    } else {
+                        Debug.LogWarning($"File not exist: {path}");
+                    }
+                }
+            }
         }
 
         void UpdateCustom() {
