@@ -4,6 +4,7 @@ using BepInEx.Configuration;
 
 using BepInEx.Logging;
 using HarmonyLib;
+using InControl;
 using MonoMod.RuntimeDetour;
 using Newtonsoft.Json;
 using NineSolsAPI;
@@ -14,8 +15,9 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using UnityEngine.UIElements;
 using static SkinMod.testGif;
-using static System.Net.Mime.MediaTypeNames;
 namespace SkinMod {
     [BepInDependency(NineSolsAPICore.PluginGUID)]
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
@@ -267,7 +269,99 @@ namespace SkinMod {
                     }
                 }
             }
+
+            // Wait execute repalce
+            //if (GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/PlayerSprite/Effect_Foo/FooDots/D1/FooDot (1)/JENG/Ball") != null) {
+            //    var spriteName = GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/PlayerSprite/Effect_Foo/FooDots/D1/FooDot (1)/JENG/Ball").GetComponent<SpriteRenderer>().sprite.name;
+            //    if (spriteName == "") return;
+            //    string path = $"E:\\Games\\Nine Sols1030\\NineSols_Data\\extract\\testSkin2\\Sprite\\{GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/PlayerSprite/Effect_Foo/FooDots/D1/FooDot (1)/JENG/Ball").GetComponent<SpriteRenderer>().sprite.name}.png";
+            //    if (File.Exists(path)) {
+            //        byte[] data = File.ReadAllBytes(path);
+            //        Texture2D tex2D = new Texture2D(2, 2);
+            //        if (tex2D.LoadImage(data)) {
+            //            Sprite sprite = Sprite.Create(tex2D, new Rect(0, 0, tex2D.width, tex2D.height), new Vector2(0.5f, 0f), 1.0f);
+            //            //var test = ImageConversion.LoadImage(tex2D, data);
+            //            GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/PlayerSprite/Effect_Foo/FooDots/D1/FooDot (1)/JENG/Ball").GetComponent<SpriteRenderer>().sprite = sprite;
+            //            //GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/PlayerSprite/Effect_Foo/FooDots/D2/FooDot (2)/JENG/Ball").GetComponent<SpriteRenderer>().sprite = sprite;
+            //            //GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/PlayerSprite/Effect_Foo/FooDots/D3/FooDot (3)/JENG/Ball").GetComponent<SpriteRenderer>().sprite = sprite;
+            //            //GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/PlayerSprite/Effect_Foo/FooDots/D4/FooDot (4)/JENG/Ball").GetComponent<SpriteRenderer>().sprite = sprite;
+            //            //GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/PlayerSprite/Effect_Foo/FooDots/D5/FooDot (5)/JENG/Ball").GetComponent<SpriteRenderer>().sprite = sprite;
+            //        }
+            //    } else {
+            //        Debug.LogWarning($"File not exist: {path}");
+            //    }
+            //}
+            //if (GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/PlayerSprite/Effect_Foo/FooDots/D1/FooDot (2)/JENG/Ball") != null) {
+            //    var spriteName = GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/PlayerSprite/Effect_Foo/FooDots/D2/FooDot (2)/JENG/Ball").GetComponent<SpriteRenderer>().sprite.name;
+            //    if (spriteName == "") return;
+            //    string path = $"E:\\Games\\Nine Sols1030\\NineSols_Data\\extract\\testSkin2\\Sprite\\{GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/PlayerSprite/Effect_Foo/FooDots/D2/FooDot (2)/JENG/Ball").GetComponent<SpriteRenderer>().sprite.name}.png";
+            //    if (File.Exists(path)) {
+            //        byte[] data = File.ReadAllBytes(path);
+            //        Texture2D tex2D = new Texture2D(2, 2);
+            //        if (tex2D.LoadImage(data)) {
+            //            Sprite sprite = Sprite.Create(tex2D, new Rect(0, 0, tex2D.width, tex2D.height), new Vector2(0.5f, 0f), 1.0f);
+            //            //var test = ImageConversion.LoadImage(tex2D, data);
+            //            //GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/PlayerSprite/Effect_Foo/FooDots/D1/FooDot (1)/JENG/Ball").GetComponent<SpriteRenderer>().sprite = sprite;
+            //            GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/PlayerSprite/Effect_Foo/FooDots/D2/FooDot (2)/JENG/Ball").GetComponent<SpriteRenderer>().sprite = sprite;
+            //            //GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/PlayerSprite/Effect_Foo/FooDots/D3/FooDot (3)/JENG/Ball").GetComponent<SpriteRenderer>().sprite = sprite;
+            //            //GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/PlayerSprite/Effect_Foo/FooDots/D4/FooDot (4)/JENG/Ball").GetComponent<SpriteRenderer>().sprite = sprite;
+            //            //GameObject.Find("GameCore(Clone)/RCG LifeCycle/PPlayer/RotateProxy/SpriteHolder/PlayerSprite/Effect_Foo/FooDots/D5/FooDot (5)/JENG/Ball").GetComponent<SpriteRenderer>().sprite = sprite;
+            //        }
+            //    } else {
+            //        Debug.LogWarning($"File not exist: {path}");
+            //    }
+            //}
+
+            //Chi Sprite
+            //if (GameObject.Find("GameCore(Clone)/RCG LifeCycle/UIManager/GameplayUICamera/HideUIAbilityCheck/[Activate] PlayerUI Folder/PlayerInGameUI renderer/LeftTop/ParryCharge/ParryBalls/ParryPoint/BG") != null) {
+            //    string path = $"E:\\Games\\Nine Sols1030\\NineSols_Data\\extract\\testSkin2\\goodtimefrog.png";
+            //    if (File.Exists(path)) {
+            //        byte[] data = File.ReadAllBytes(path);
+            //        Texture2D tex2D = new Texture2D(2, 2);
+            //        if (tex2D.LoadImage(data)) {
+            //            Sprite sprite = Sprite.Create(tex2D, new Rect(0, 0, tex2D.width, tex2D.height), new Vector2(0.5f, 0f), 4.0f);
+            //            //var test = ImageConversion.LoadImage(tex2D, data);
+            //            GameObject.Find("GameCore(Clone)/RCG LifeCycle/UIManager/GameplayUICamera/HideUIAbilityCheck/[Activate] PlayerUI Folder/PlayerInGameUI renderer/LeftTop/ParryCharge/ParryBalls/ParryPoint/BG").GetComponent<SpriteRenderer>().sprite = sprite;
+            //        }
+            //    } else {
+            //        Debug.LogWarning($"File not exist: {path}");
+            //    }
+            //}
+
+            //Spawn ball need to foreach spawnpoint
+            //if (GameObject.Find("GameLevel_VR_Challenge/Room/Prefab/SavePoint_Berserk (1)/LotusSP/ST/STBall/SavePointPowerA0") != null) {
+            //    string path = $"E:\\Games\\Nine Sols1030\\NineSols_Data\\extract\\testSkin2\\goodtimefrog.png";
+            //    if (File.Exists(path)) {
+            //        byte[] data = File.ReadAllBytes(path);
+            //        Texture2D tex2D = new Texture2D(2, 2);
+            //        if (tex2D.LoadImage(data)) {
+            //            Sprite sprite = Sprite.Create(tex2D, new Rect(0, 0, tex2D.width, tex2D.height), new Vector2(0.5f, 0f), 4.0f);
+            //            //var test = ImageConversion.LoadImage(tex2D, data);
+            //            GameObject.Find("GameLevel_VR_Challenge/Room/Prefab/SavePoint_Berserk (1)/LotusSP/ST/STBall/SavePointPowerA0").GetComponent<SpriteRenderer>().sprite = sprite;
+            //        }
+            //    } else {
+            //        Debug.LogWarning($"File not exist: {path}");
+            //    }
+            //}
+
+            //Menu Logo
+            //if (GameObject.Find("MenuLogic/MainMenuLogic/Providers/MenuUIPanel/Logo") != null) {
+            //    string path = $"E:\\Games\\Nine Sols1030\\NineSols_Data\\extract\\testSkin2\\goodtimefrog.png";
+            //    if (File.Exists(path)) {
+            //        byte[] data = File.ReadAllBytes(path);
+            //        Texture2D tex2D = new Texture2D(2, 2);
+            //        if (tex2D.LoadImage(data)) {
+            //            Sprite sprite = Sprite.Create(tex2D, new Rect(0, 0, tex2D.width, tex2D.height), new Vector2(0.5f, 0f), 8.0f);
+            //            //var test = ImageConversion.LoadImage(tex2D, data);
+            //            GameObject.Find("MenuLogic/MainMenuLogic/Providers/MenuUIPanel/Logo").GetComponent<UnityEngine.UI.Image>().sprite = sprite;
+            //        }
+            //    } else {
+            //        Debug.LogWarning($"File not exist: {path}");
+            //    }
+            //}
         }
+
+
 
         void UpdateCustom() {
             //ToastManager.Toast("test");
@@ -475,6 +569,48 @@ namespace SkinMod {
             //ToastManager.Toast(attackEffect.Value);
             if (attackEffect.Value) {
                 AttackEffect(true);
+            }
+
+            if (attackEffect.Value) {
+                AttackEffect(true);
+            }
+
+            //MenuLogo
+            //if(SceneManager.GetActiveScene().name == "TitleScreenMenu") {
+            //    if (GameObject.Find("MenuLogic/MainMenuLogic/Providers/MenuUIPanel/Logo") != null) {
+            //        string path = $"E:\\Games\\Nine Sols1030\\NineSols_Data\\extract\\testSkin2\\goodtimefrog.png"; // 9sLOGO_1.png
+            //        if (File.Exists(path)) {
+            //            byte[] data = File.ReadAllBytes(path);
+            //            Texture2D tex2D = new Texture2D(2, 2);
+            //            if (tex2D.LoadImage(data)) {
+            //                Sprite sprite = Sprite.Create(tex2D, new Rect(0, 0, tex2D.width, tex2D.height), new Vector2(0.5f, 0f), 8.0f);
+            //                //var test = ImageConversion.LoadImage(tex2D, data);
+            //                GameObject.Find("MenuLogic/MainMenuLogic/Providers/MenuUIPanel/Logo").GetComponent<UnityEngine.UI.Image>().sprite = sprite;
+            //            }
+            //        } else {
+            //            Debug.LogWarning($"File not exist: {path}");
+            //        }
+            //    }
+            //}
+
+            //UI Chi ParryBall
+            if (GameObject.Find("GameCore(Clone)/RCG LifeCycle/UIManager/GameplayUICamera/HideUIAbilityCheck/[Activate] PlayerUI Folder/PlayerInGameUI renderer/LeftTop/ParryCharge/ParryBalls/ParryPoint/BG/Rotate/Fill") != null) {
+                string path = $"E:\\Games\\Nine Sols1030\\NineSols_Data\\extract\\testSkin2\\ParryFrog2.png"; //ParryBalls.png
+                if (File.Exists(path)) {
+                    byte[] data = File.ReadAllBytes(path);
+                    Texture2D tex2D = new Texture2D(2, 2);
+                    if (tex2D.LoadImage(data)) {
+                        Sprite sprite = Sprite.Create(tex2D, new Rect(0, 0, tex2D.width, tex2D.height), new Vector2(0.5f, 0.5f), 2f);
+                        //var test = ImageConversion.LoadImage(tex2D, data);
+                        GameObject.Find("GameCore(Clone)/RCG LifeCycle/UIManager/GameplayUICamera/HideUIAbilityCheck/[Activate] PlayerUI Folder/PlayerInGameUI renderer/LeftTop/ParryCharge/ParryBalls/ParryPoint/BG/Rotate/Fill").GetComponent<SpriteRenderer>().sprite = sprite;
+                        GameObject.Find("GameCore(Clone)/RCG LifeCycle/UIManager/GameplayUICamera/HideUIAbilityCheck/[Activate] PlayerUI Folder/PlayerInGameUI renderer/LeftTop/ParryCharge/ParryBalls/ParryPoint (5)/BG/Rotate/Fill").GetComponent<SpriteRenderer>().sprite = sprite;
+                        GameObject.Find("GameCore(Clone)/RCG LifeCycle/UIManager/GameplayUICamera/HideUIAbilityCheck/[Activate] PlayerUI Folder/PlayerInGameUI renderer/LeftTop/ParryCharge/ParryBalls/ParryPoint (6)/BG/Rotate/Fill").GetComponent<SpriteRenderer>().sprite = sprite;
+                        GameObject.Find("GameCore(Clone)/RCG LifeCycle/UIManager/GameplayUICamera/HideUIAbilityCheck/[Activate] PlayerUI Folder/PlayerInGameUI renderer/LeftTop/ParryCharge/ParryBalls/ParryPoint (7)/BG/Rotate/Fill").GetComponent<SpriteRenderer>().sprite = sprite;
+                        GameObject.Find("GameCore(Clone)/RCG LifeCycle/UIManager/GameplayUICamera/HideUIAbilityCheck/[Activate] PlayerUI Folder/PlayerInGameUI renderer/LeftTop/ParryCharge/ParryBalls/ParryPoint (8)/BG/Rotate/Fill").GetComponent<SpriteRenderer>().sprite = sprite;
+                    }
+                } else {
+                    Debug.LogWarning($"File not exist: {path}");
+                }
             }
         }
 
